@@ -1,0 +1,17 @@
+<fckawe>
+	<application>
+		<name>The NoName-Game</name>
+		<icon path="images/icon.png" />
+	</application>
+	<screen>
+		<width>800</width>
+		<height>600</height>
+		<scale>1.0</scale>
+		<bitDepth>24</bitDepth>
+		<refreshRate>0</refreshRate>
+		<fullScreen>true</fullScreen>
+	</screen>
+	<session>
+		<locale>AUTO</locale>
+	</session>
+</fckawe>
