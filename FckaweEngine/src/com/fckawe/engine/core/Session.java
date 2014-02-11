@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import org.slf4j.Logger;
 
+import com.fckawe.engine.ui.UserInterface;
 import com.fckawe.engine.utils.FckaweFactory;
 import com.fckawe.engine.utils.LoggerFactory;
 import com.fckawe.engine.utils.NLS;
@@ -25,16 +26,22 @@ public class Session {
 
 	private NLS nls;
 
+	private Heart heart;
+
+	private Application app;
+
 	private static Session session;
 
 	/**
 	 * Creates a new user session. Will be usually called only once.
 	 * 
+	 * @param app
+	 *            The application to create a session for.
 	 * @return A new user session instance.
 	 */
-	public static Session newSession() {
+	public static Session newSession(final Application app) {
 		session = new Session();
-		session.init();
+		session.init(app);
 		return session;
 	}
 
@@ -50,21 +57,28 @@ public class Session {
 	/**
 	 * Initializes the user session. Will be usually called only once (after
 	 * creating a new session).
+	 * 
+	 * @param app
+	 *            The application to create a session for.
 	 */
-	protected void init() {
+	protected void init(final Application app) {
+		this.app = app;
+
 		// first create loggerFactory since other initialising logics want to
 		// log some messages...
 		loggerFactory = fckaweFactory.newLoggerFactory();
 
 		configuration = fckaweFactory.newConfiguration();
 		Locale locale = configuration.getSessionCat().getLocale();
-		Logger logger = getLogger(LoggerFactory.MAIN_LOGGER);
+		Logger logger = getMainLogger();
 		if (logger.isInfoEnabled()) {
 			logger.info("Set locale to '" + locale + "'");
 		}
 		Locale.setDefault(locale);
 
 		nls = fckaweFactory.newNLS();
+
+		heart = fckaweFactory.newHeart(app);
 	}
 
 	/**
@@ -76,6 +90,31 @@ public class Session {
 	 */
 	public Logger getLogger(final String loggerId) {
 		return loggerFactory.getLogger(loggerId);
+	}
+
+	// TODO: comment
+	public Logger getMainLogger() {
+		return getLogger(LoggerFactory.MAIN_LOGGER);
+	}
+
+	// TODO: comment
+	public Logger getConfigLogger() {
+		return getLogger(LoggerFactory.CONFIG_LOGGER);
+	}
+
+	// TODO: comment
+	public Logger getHeartLogger() {
+		return getLogger(LoggerFactory.HEART_LOGGER);
+	}
+
+	// TODO: comment
+	public Logger getGrafixLogger() {
+		return getLogger(LoggerFactory.GRAFIX_LOGGER);
+	}
+
+	// TODO: comment
+	public Logger getSoundLogger() {
+		return getLogger(LoggerFactory.SOUND_LOGGER);
 	}
 
 	/**
@@ -96,6 +135,31 @@ public class Session {
 	 */
 	public NLS getNLS() {
 		return nls;
+	}
+
+	// TODO: comment
+	public Heart getHeart() {
+		return heart;
+	}
+
+	// TODO: comment
+	public Application getApplication() {
+		return app;
+	}
+
+	// TODO: comment
+	public UserInterface getUserInterface() {
+		return app.getUserInterface();
+	}
+
+	// TODO: comment
+	public FckaweFactory getFckaweFactory() {
+		return fckaweFactory;
+	}
+
+	// TODO: comment
+	public String getEngineName() {
+		return "fckaweEngine";
 	}
 
 }

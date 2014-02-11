@@ -1,6 +1,8 @@
 package com.fckawe.engine.utils;
 
 import com.fckawe.engine.core.Configuration;
+import com.fckawe.engine.core.Heart;
+import com.fckawe.engine.ui.UserInterface;
 
 /**
  * The FckaweFactory should be used to instantiate important parts of the
@@ -64,6 +66,20 @@ public class FckaweFactory {
 	 */
 	public NLS newNLS() {
 		return new NLS();
+	}
+
+	/**
+	 * Creates and returns a new Heart instance.
+	 * 
+	 * @return A newly created Heart instance.
+	 */
+	public Heart newHeart(final Heart.ExitListener exitListener) {
+		return new Heart(exitListener);
+	}
+
+	// TODO: comment
+	public UserInterface newUserInterface() {
+		return new UserInterface();
 	}
 
 }

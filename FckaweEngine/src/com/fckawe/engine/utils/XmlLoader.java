@@ -86,6 +86,8 @@ public class XmlLoader {
 	 */
 	private class Handler extends DefaultHandler {
 
+		private static final String FCKAWE_ID = "fckawe_id";
+
 		private final Breadcrumb path = new Breadcrumb();
 
 		private final StringBuilder content = new StringBuilder();
@@ -100,13 +102,34 @@ public class XmlLoader {
 		@Override
 		public void startElement(final String uri, final String localName,
 				final String qName, final Attributes attrs) throws SAXException {
-			path.push(qName);
+			String pathPart = qName;
+
 			for (int i = 0; i < attrs.getLength(); i++) {
 				String attrQName = attrs.getQName(i);
+				String value = attrs.getValue(attrQName);
+				if (attrQName.equals(FCKAWE_ID)) {
+					pathPart += "." + value;
+					break;
+				}
+			}
+
+			path.push(pathPart);
+
+			for (int i = 0; i < attrs.getLength(); i++) {
+				String attrQName = attrs.getQName(i);
+				if (attrQName.equals(FCKAWE_ID)) {
+					continue;
+				}
+				String value = attrs.getValue(attrQName);
 				path.push(attrQName);
-				values.put(path.toString(), attrs.getValue(attrQName));
+				String key = path.toString();
+				if (values.containsKey(key)) {
+					value = values.get(key) + value;
+				}
+				values.put(key, value);
 				path.pop();
 			}
+
 			content.setLength(0);
 			inElement = true;
 		}
@@ -134,7 +157,12 @@ public class XmlLoader {
 				final String qName) throws SAXException {
 			inElement = false;
 			if (content.length() > 0) {
-				values.put(path.toString(), content.toString());
+				String key = path.toString();
+				String value = content.toString();
+				if (values.containsKey(key)) {
+					value = values.get(key) + value;
+				}
+				values.put(key, value);
 			}
 			content.setLength(0);
 			path.pop();

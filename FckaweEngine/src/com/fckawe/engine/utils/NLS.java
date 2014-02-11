@@ -46,8 +46,7 @@ public class NLS {
 	 *            The session to initialize NLS with.
 	 */
 	public NLS(final Session session) {
-		logger = session == null ? null : session
-				.getLogger(LoggerFactory.MAIN_LOGGER);
+		logger = session == null ? null : session.getMainLogger();
 		bundles = new HashMap<String, ResourceBundle>();
 		registerResourceBundle(CORE, "nls.fckaweCore");
 	}

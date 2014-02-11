@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<fonts>
+	<font fckawe_id="default" name="default" width="10" height="16">
+		<bitmap file="default.png">
+			<line fckawe_id="1">ABCDEFGHIJ</line>
+			<line fckawe_id="2">KLMNOPQRST</line>
+			<line fckawe_id="3">UVWXYZÄÖÜ </line>
+			<line fckawe_id="4">0123456789</line>
+			<line fckawe_id="5">.!?,;:/%=-</line>
+			<line fckawe_id="6">_*)(#&quot;'&amp;+</line>
+		</bitmap>
+	</font>
+</fonts>

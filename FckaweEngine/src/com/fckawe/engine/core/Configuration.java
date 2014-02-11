@@ -8,7 +8,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 import com.fckawe.engine.utils.Breadcrumb;
-import com.fckawe.engine.utils.LoggerFactory;
 import com.fckawe.engine.utils.XmlLoader;
 
 /**
@@ -42,8 +41,7 @@ public class Configuration {
 	 *            The session to create the Configuration instance with.
 	 */
 	public Configuration(final Session session) {
-		logger = session == null ? null : session
-				.getLogger(LoggerFactory.CONFIG_LOGGER);
+		logger = session == null ? null : session.getConfigLogger();
 
 		String configFilePath = getConfigFilePath();
 		if (logger != null && logger.isInfoEnabled()) {
