@@ -5,6 +5,7 @@ import java.util.Observer;
 
 import com.fckawe.engine.ui.UserInterface;
 
+// TODO: comment class and methods
 public class Application implements Observer, Heart.ExitListener {
 
 	private Heart heart;
@@ -15,21 +16,8 @@ public class Application implements Observer, Heart.ExitListener {
 		Session.newSession(this);
 	}
 
-	public void run() {
+	public void start() {
 		init();
-
-		// TODO: Endlosschleife nur zum Test
-		boolean ende = false;
-		while (!ende) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		heart.requestExit();
 	}
 
 	protected void init() {
@@ -67,6 +55,10 @@ public class Application implements Observer, Heart.ExitListener {
 				throw new IllegalStateException("Unexpected data type: "
 						+ data.getClass().getName());
 			}
+
+			// TODO: tick in UserInterface verschoben. Kann Application als
+			// Observable jetzt raus?! Kommt drauf an, ob hier wieder ähnlich
+			// wie mit den GameParts etwas reinkommen wird.
 
 			switch (event) {
 			case TICK:

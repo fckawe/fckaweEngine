@@ -25,12 +25,14 @@ public class ConfigurationTest {
 		int bitDepth = c.getScreenCat().getBitDepth();
 		int refreshRate = c.getScreenCat().getRefreshRate();
 		boolean fullScreen = c.getScreenCat().isFullScreen();
+		boolean showFps = c.getScreenCat().isShowFps();
 		assertEquals(800, width);
 		assertEquals(600, height);
 		assertEquals(1.0, scale, 0.01);
-		assertEquals(24, bitDepth);
+		assertEquals(32, bitDepth);
 		assertEquals(0, refreshRate);
-		assertEquals(true, fullScreen);
+		assertEquals(false, fullScreen);
+		assertEquals(true, showFps);
 		
 		// "session" category
 		Locale locale = c.getSessionCat().getLocale();

@@ -2,6 +2,7 @@ package com.fckawe.engine.core;
 
 import java.util.Observable;
 
+// TODO: comment class and methods
 public class Heart extends Observable implements Runnable {
 
 	public enum Event {

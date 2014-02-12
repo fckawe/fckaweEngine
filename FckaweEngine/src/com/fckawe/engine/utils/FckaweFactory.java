@@ -77,7 +77,11 @@ public class FckaweFactory {
 		return new Heart(exitListener);
 	}
 
-	// TODO: comment
+	/**
+	 * Creates and returns a new UserInterface instance.
+	 * 
+	 * @return A newly created UserInterface instance.
+	 */
 	public UserInterface newUserInterface() {
 		return new UserInterface();
 	}

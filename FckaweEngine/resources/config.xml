@@ -7,9 +7,10 @@
 		<width>800</width>
 		<height>600</height>
 		<scale>1.0</scale>
-		<bitDepth>24</bitDepth>
+		<bitDepth>32</bitDepth>
 		<refreshRate>0</refreshRate>
-		<fullScreen>true</fullScreen>
+		<fullScreen>false</fullScreen>
+		<showFps>true</showFps>
 	</screen>
 	<session>
 		<locale>AUTO</locale>

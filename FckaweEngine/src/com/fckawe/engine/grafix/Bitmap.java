@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 /**
  * A bitmap graphic represented by its pixel values.
- * @author Gerald Backmeister
+ * @author fckawe
  */
 public class Bitmap {
 

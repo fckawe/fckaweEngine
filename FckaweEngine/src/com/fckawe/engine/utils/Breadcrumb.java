@@ -9,6 +9,10 @@ import java.util.Stack;
  */
 @SuppressWarnings("serial")
 public class Breadcrumb extends Stack<String> {
+	
+	public static final String PATH_SEPARATOR = ".";
+	
+	public static final String PATH_SEPARATOR_REGEXED = "\\.";
 
 	/**
 	 * Returns the string representation of the current path, which means that
@@ -21,7 +25,7 @@ public class Breadcrumb extends Stack<String> {
 		StringBuilder sb = new StringBuilder();
 		for (String str : this) {
 			if (sb.length() > 0) {
-				sb.append(".");
+				sb.append(PATH_SEPARATOR);
 			}
 			sb.append(str);
 		}

@@ -304,8 +304,9 @@ public class Configuration {
 		@Override
 		protected void parseInternal(final Breadcrumb path,
 				final Map<String, String> values) {
-			name = values.get(path + ".name");
-			iconPath = values.get(path + ".icon.path");
+			name = values.get(path + Breadcrumb.PATH_SEPARATOR + "name");
+			iconPath = values.get(path + Breadcrumb.PATH_SEPARATOR
+					+ "icon.path");
 			if (logger != null && logger.isInfoEnabled()) {
 				logger.info("Application.name = " + name);
 				logger.info("Application.iconPath = " + iconPath);
@@ -352,6 +353,8 @@ public class Configuration {
 
 		private boolean fullScreen;
 
+		private boolean showFps;
+
 		@Override
 		protected String getElementPath() {
 			return "screen";
@@ -360,12 +363,19 @@ public class Configuration {
 		@Override
 		protected void parseInternal(final Breadcrumb path,
 				final Map<String, String> values) {
-			width = parseInt(values, path + ".width");
-			height = parseInt(values, path + ".height");
-			scale = parseDouble(values, path + ".scale");
-			bitDepth = parseInt(values, path + ".bitdepth");
-			refreshRate = parseInt(values, path + ".refreshrate");
-			fullScreen = parseBoolean(values, path + ".fullscreen");
+			width = parseInt(values, path + Breadcrumb.PATH_SEPARATOR + "width");
+			height = parseInt(values, path + Breadcrumb.PATH_SEPARATOR
+					+ "height");
+			scale = parseDouble(values, path + Breadcrumb.PATH_SEPARATOR
+					+ "scale");
+			bitDepth = parseInt(values, path + Breadcrumb.PATH_SEPARATOR
+					+ "bitdepth");
+			refreshRate = parseInt(values, path + Breadcrumb.PATH_SEPARATOR
+					+ "refreshrate");
+			fullScreen = parseBoolean(values, path + Breadcrumb.PATH_SEPARATOR
+					+ "fullscreen");
+			showFps = parseBoolean(values, path + Breadcrumb.PATH_SEPARATOR
+					+ "showFps");
 			if (logger != null && logger.isInfoEnabled()) {
 				logger.info("Screen.width = " + width);
 				logger.info("Screen.height = " + height);
@@ -373,6 +383,7 @@ public class Configuration {
 				logger.info("Screen.bitDepth = " + bitDepth);
 				logger.info("Screen.refreshRate = " + refreshRate);
 				logger.info("Screen.fullScreen = " + fullScreen);
+				logger.info("Screen.showFps = " + showFps);
 			}
 		}
 
@@ -424,10 +435,21 @@ public class Configuration {
 		/**
 		 * Returns true, if the application should run in fullscreen mode.
 		 * 
-		 * @return True, if the application shoudl run in fullscreen mode.
+		 * @return True, if the application should run in fullscreen mode.
 		 */
 		public boolean isFullScreen() {
 			return fullScreen;
+		}
+
+		/**
+		 * Returns true, if the current FPS number should be displayed on the
+		 * screen.
+		 * 
+		 * @return True, if the current FPS number show be display on the
+		 *         screen.
+		 */
+		public boolean isShowFps() {
+			return showFps;
 		}
 
 	}
@@ -452,7 +474,8 @@ public class Configuration {
 		@Override
 		protected void parseInternal(final Breadcrumb path,
 				final Map<String, String> values) {
-			String str = values.get(path + ".locale");
+			String str = values
+					.get(path + Breadcrumb.PATH_SEPARATOR + "locale");
 			parseLocale(str);
 		}
 

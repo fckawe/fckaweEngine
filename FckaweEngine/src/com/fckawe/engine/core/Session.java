@@ -92,27 +92,47 @@ public class Session {
 		return loggerFactory.getLogger(loggerId);
 	}
 
-	// TODO: comment
+	/**
+	 * Returns the main logger.
+	 * 
+	 * @return The main logger.
+	 */
 	public Logger getMainLogger() {
 		return getLogger(LoggerFactory.MAIN_LOGGER);
 	}
 
-	// TODO: comment
+	/**
+	 * Returns the configuration logger.
+	 * 
+	 * @return The configuration logger.
+	 */
 	public Logger getConfigLogger() {
 		return getLogger(LoggerFactory.CONFIG_LOGGER);
 	}
 
-	// TODO: comment
+	/**
+	 * Returns the heart logger.
+	 * 
+	 * @return The heart logger.
+	 */
 	public Logger getHeartLogger() {
 		return getLogger(LoggerFactory.HEART_LOGGER);
 	}
 
-	// TODO: comment
+	/**
+	 * Returns the grafix logger.
+	 * 
+	 * @return The grafix logger.
+	 */
 	public Logger getGrafixLogger() {
 		return getLogger(LoggerFactory.GRAFIX_LOGGER);
 	}
 
-	// TODO: comment
+	/**
+	 * Returns the sound logger.
+	 * 
+	 * @return The sound logger.
+	 */
 	public Logger getSoundLogger() {
 		return getLogger(LoggerFactory.SOUND_LOGGER);
 	}
@@ -137,27 +157,48 @@ public class Session {
 		return nls;
 	}
 
-	// TODO: comment
+	/**
+	 * Returns the application heart.
+	 * 
+	 * @return The application heart.
+	 */
 	public Heart getHeart() {
 		return heart;
 	}
 
-	// TODO: comment
+	/**
+	 * Returns the main application.
+	 * 
+	 * @return The main application.
+	 */
 	public Application getApplication() {
 		return app;
 	}
 
-	// TODO: comment
+	/**
+	 * Returns the user interface.
+	 * 
+	 * @return The user interface.
+	 */
 	public UserInterface getUserInterface() {
 		return app.getUserInterface();
 	}
 
-	// TODO: comment
+	/**
+	 * Returns the fckawe factory which can be used to instantiate objects via
+	 * factory method. That way the classes can be overloaded.
+	 * 
+	 * @return The fckawe factory.
+	 */
 	public FckaweFactory getFckaweFactory() {
 		return fckaweFactory;
 	}
 
-	// TODO: comment
+	/**
+	 * Returns the name of the engine.
+	 * 
+	 * @return The name of the engine.
+	 */
 	public String getEngineName() {
 		return "fckaweEngine";
 	}
