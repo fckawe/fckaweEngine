@@ -10,7 +10,7 @@ import com.fckawe.engine.input.InputHandler;
 public class BouncingBallDemo extends Module {
 
 	private long startTime;
-	
+
 	public BouncingBallDemo(final Game game) {
 		super(game);
 		startTime = 0;
@@ -23,23 +23,23 @@ public class BouncingBallDemo extends Module {
 
 	@Override
 	protected void loadEntities() {
-		entities.put("bouncingball", new BouncingBall(bitmaps));
+		entities.put("bouncingball", new BouncingBall(game));
 	}
 
 	@Override
 	public void tick(final InputHandler inputHandler) {
 		super.tick(inputHandler);
-		
+
 		if (inputHandler.isPressed(KeyEvent.VK_ESCAPE)) {
 			inputHandler.consume(KeyEvent.VK_ESCAPE);
 			end(null);
 		} else {
-			long currentTime = System.currentTimeMillis();
-			if (startTime == 0) {
-				startTime = currentTime;
-			} else if (currentTime - startTime >= 15000) {
-				end(null);
-			}
+			// long currentTime = System.currentTimeMillis();
+			// if (startTime == 0) {
+			// startTime = currentTime;
+			// } else if (currentTime - startTime >= 15000) {
+			// end(null);
+			// }
 		}
 	}
 

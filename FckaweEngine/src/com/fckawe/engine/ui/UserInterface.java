@@ -48,7 +48,7 @@ public class UserInterface extends Canvas implements Observer {
 		screen = new Screen(screenDimension);
 
 		initGrafix();
-		
+
 		game = Session.getSession().getFckaweFactory().newGame(this);
 	}
 
@@ -172,8 +172,8 @@ public class UserInterface extends Canvas implements Observer {
 		int width = (int) uiDimension.getWidth();
 		int height = (int) uiDimension.getHeight();
 
-		int translateX = (int) ((getWidth() - width) / 2);
-		int translateY = (int) ((getHeight() - height) / 2);
+		int translateX = (getWidth() - width) / 2;
+		int translateY = (getHeight() - height) / 2;
 
 		g.translate(translateX, translateY);
 		g.clipRect(0, 0, width, height);
@@ -204,9 +204,13 @@ public class UserInterface extends Canvas implements Observer {
 	public Bitmaps getBitmaps() {
 		return bitmaps;
 	}
-	
+
 	public InputHandler getInputHandler() {
 		return inputHandler;
+	}
+
+	public double getCurrentFps() {
+		return framesPerSecond;
 	}
 
 }

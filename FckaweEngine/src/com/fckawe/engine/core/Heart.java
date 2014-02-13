@@ -18,7 +18,7 @@ public class Heart extends Observable implements Runnable {
 
 	// Stuff for stats
 	// we'll be reading the stats every second
-	private final static int STAT_INTERVAL = 1000; // ms
+	private final static int STAT_INTERVAL = 10000; // ms
 	// the average will be calculated by storing
 	// the last n FPSs
 	private final static int FPS_HISTORY_NR = 10;
@@ -39,6 +39,8 @@ public class Heart extends Observable implements Runnable {
 	private long statsCount = 0;
 	// the average FPS since the game started
 	private double averageFps = 0.0;
+
+	private boolean initializingFps = true;
 
 	private final StopListener stopListener;
 
@@ -165,10 +167,13 @@ public class Heart extends Observable implements Runnable {
 
 			// obtain the average
 			if (statsCount < FPS_HISTORY_NR) {
-				// in case of the first 10 triggers
-				averageFps = totalFps / statsCount;
+				if (!initializingFps) {
+					// in case of the first FPS_HISTORY_NR triggers
+					averageFps = totalFps / statsCount;
+				}
 			} else {
 				averageFps = totalFps / FPS_HISTORY_NR;
+				initializingFps = false;
 			}
 			// saving the number of total frames skipped
 			totalFramesSkipped += framesSkippedPerStatCycle;
@@ -179,6 +184,9 @@ public class Heart extends Observable implements Runnable {
 
 			statusIntervalTimer = System.currentTimeMillis();
 			lastStatusStore = statusIntervalTimer;
+			signalEvent(Event.FPS_UPDATED, averageFps);
+		} else if (initializingFps) {
+			averageFps = TARGET_FPS;
 			signalEvent(Event.FPS_UPDATED, averageFps);
 		}
 	}

@@ -1,24 +1,21 @@
 package com.fckawe.engine.game.demo.entity;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fckawe.engine.game.Game;
 import com.fckawe.engine.game.entity.Entity;
 import com.fckawe.engine.grafix.Bitmaps;
+import com.fckawe.engine.input.InputHandler;
 import com.fckawe.engine.ui.Screen;
 
 public class BouncingBall extends Entity {
 
 	private static final String BMP_BOUNCING_BALL = "BouncingBall";
-	
-	private int testPosY;
-	
-	private int testDelay;
-	
-	public BouncingBall(Bitmaps bitmaps) {
-		super(bitmaps);
-		testPosY = 30;
-		testDelay = 0;
+
+	public BouncingBall(final Game game) {
+		super(game);
 	}
 
 	@Override
@@ -30,29 +27,63 @@ public class BouncingBall extends Entity {
 
 	@Override
 	public void loadRequiredBitmap(final String id) {
+		Bitmaps bitmaps = getBitmaps();
 		String globalId = getGlobalBitmapId(id);
-		if(id.equals(BMP_BOUNCING_BALL)) {
+		if (id.equals(BMP_BOUNCING_BALL)) {
 			bitmaps.loadBitmap(globalId, "/images/demo/bouncingball.png");
 		}
 	}
 
 	@Override
 	public void tick() {
-		if(currentBitmap == null) {
+		if (currentBitmap == null) {
+			Bitmaps bitmaps = getBitmaps();
 			String globalId = getGlobalBitmapId(BMP_BOUNCING_BALL);
 			currentBitmap = bitmaps.getBitmap(globalId);
 		}
-		
-		testDelay++;
-		if(testDelay > 0) {
-			testPosY += 3;
-			testDelay = 0;
+		InputHandler inputHandler = getInputHandler();
+		if (inputHandler != null && inputHandler.isPressed(KeyEvent.VK_RIGHT)) {
+			accelerateRight();
+		} else if (inputHandler != null
+				&& inputHandler.isPressed(KeyEvent.VK_LEFT)) {
+			accelerateLeft();
+		} else {
+			accelX = 0;
 		}
+		if (inputHandler != null && inputHandler.isPressed(KeyEvent.VK_UP)) {
+			accelerateUp();
+		} else if (inputHandler != null
+				&& inputHandler.isPressed(KeyEvent.VK_DOWN)) {
+			accelerateDown();
+		} else {
+			accelY = 0;
+		}
+		super.tick();
 	}
 
 	@Override
 	public void render(final Screen screen) {
-		screen.blit(currentBitmap, 100, testPosY);
+		super.render(screen);
+	}
+
+	@Override
+	protected double getAccelerationSpeed() {
+		return 40;
+	}
+
+	@Override
+	protected double getDecelerationSpeed() {
+		return 130;
+	}
+
+	@Override
+	protected double getMaxAcceleration() {
+		return 200;
+	}
+
+	@Override
+	protected double getMaxVelocity() {
+		return 200;
 	}
 
 }
