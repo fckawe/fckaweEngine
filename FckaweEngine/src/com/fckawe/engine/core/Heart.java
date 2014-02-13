@@ -40,12 +40,12 @@ public class Heart extends Observable implements Runnable {
 	// the average FPS since the game started
 	private double averageFps = 0.0;
 
-	private final ExitListener exitListener;
+	private final StopListener stopListener;
 
 	private boolean exitRequested;
 
-	public Heart(final ExitListener exitListener) {
-		this.exitListener = exitListener;
+	public Heart(final StopListener exitListener) {
+		this.stopListener = exitListener;
 		exitRequested = false;
 	}
 
@@ -111,14 +111,14 @@ public class Heart extends Observable implements Runnable {
 			storeStats();
 		}
 
-		if (exitListener != null) {
-			exitListener.exit();
+		if (stopListener != null) {
+			stopListener.heartStopping();
 		}
 
 		Session.getSession().getHeartLogger().info("Heart stopped.");
 	}
 
-	public void requestExit() {
+	public void requestStop() {
 		exitRequested = true;
 	}
 
@@ -183,8 +183,8 @@ public class Heart extends Observable implements Runnable {
 		}
 	}
 
-	public interface ExitListener {
-		public void exit();
+	public interface StopListener {
+		public void heartStopping();
 	}
 
 	public void signalEvent(final Event event) {

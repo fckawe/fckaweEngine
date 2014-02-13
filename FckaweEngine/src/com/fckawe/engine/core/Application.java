@@ -6,7 +6,7 @@ import java.util.Observer;
 import com.fckawe.engine.ui.UserInterface;
 
 // TODO: comment class and methods
-public class Application implements Observer, Heart.ExitListener {
+public class Application implements Observer, Heart.StopListener {
 
 	private Heart heart;
 
@@ -38,8 +38,8 @@ public class Application implements Observer, Heart.ExitListener {
 	}
 
 	@Override
-	public void exit() {
-		ui.exit();
+	public void heartStopping() {
+		ui.stop();
 	}
 
 	@Override

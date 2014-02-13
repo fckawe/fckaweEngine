@@ -2,6 +2,7 @@ package com.fckawe.engine.utils;
 
 import com.fckawe.engine.core.Configuration;
 import com.fckawe.engine.core.Heart;
+import com.fckawe.engine.game.Game;
 import com.fckawe.engine.ui.UserInterface;
 
 /**
@@ -73,7 +74,7 @@ public class FckaweFactory {
 	 * 
 	 * @return A newly created Heart instance.
 	 */
-	public Heart newHeart(final Heart.ExitListener exitListener) {
+	public Heart newHeart(final Heart.StopListener exitListener) {
 		return new Heart(exitListener);
 	}
 
@@ -84,6 +85,18 @@ public class FckaweFactory {
 	 */
 	public UserInterface newUserInterface() {
 		return new UserInterface();
+	}
+
+	/**
+	 * Creates and returns a new Game instance.
+	 * 
+	 * @param ui
+	 *            The user interface.
+	 * 
+	 * @return A newly created Game instance.
+	 */
+	public Game newGame(final UserInterface ui) {
+		return new Game(ui);
 	}
 
 }

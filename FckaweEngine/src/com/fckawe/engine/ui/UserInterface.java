@@ -4,7 +4,6 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.util.Observable;
 import java.util.Observer;
@@ -12,6 +11,7 @@ import java.util.Observer;
 import com.fckawe.engine.core.Configuration;
 import com.fckawe.engine.core.Heart;
 import com.fckawe.engine.core.Session;
+import com.fckawe.engine.game.Game;
 import com.fckawe.engine.grafix.Bitmaps;
 import com.fckawe.engine.grafix.Font;
 import com.fckawe.engine.grafix.Fonts;
@@ -21,8 +21,7 @@ public class UserInterface extends Canvas implements Observer {
 
 	private static final long serialVersionUID = -5961759679622983414L;
 
-	// TODO:
-	// protected GamePart currentGamePart;
+	protected Game game;
 
 	private Frame frame;
 	private final Screen screen;
@@ -49,6 +48,8 @@ public class UserInterface extends Canvas implements Observer {
 		screen = new Screen(screenDimension);
 
 		initGrafix();
+		
+		game = Session.getSession().getFckaweFactory().newGame(this);
 	}
 
 	protected void initGrafix() {
@@ -81,7 +82,8 @@ public class UserInterface extends Canvas implements Observer {
 		frame.setVisible(true);
 	}
 
-	public void exit() {
+	public void stop() {
+		game.stop();
 		frame.close();
 		Session.getSession().getMainLogger().info("User interface stopped.");
 	}
@@ -151,11 +153,7 @@ public class UserInterface extends Canvas implements Observer {
 	protected void render() {
 		screen.clear(0);
 
-		// TODO:
-		// if (currentGamePart != null) {
-		// currentGamePart.render(screen);
-		// }
-		//
+		game.render(screen);
 
 		if (showFps) {
 			fonts.draw(screen, "FPS:" + (int) framesPerSecond, 5, 5);
@@ -190,23 +188,13 @@ public class UserInterface extends Canvas implements Observer {
 		}
 	}
 
-	// TODO:
-	// public void setCurrentGamePart(final GamePart currentGamePart) {
-	// this.currentGamePart = currentGamePart;
-	// }
-
 	public Screen getScreen() {
 		return screen;
 	}
 
 	public void tick() {
 		inputHandler.tick();
-		
-		// TODO: temporary
-		if(inputHandler.isPressed(KeyEvent.VK_ESCAPE)) {
-			inputHandler.consume(KeyEvent.VK_ESCAPE);
-			Session.getSession().getHeart().requestExit();
-		}
+		game.tick(inputHandler);
 	}
 
 	public Font getFont(final String fontName) {
@@ -215,6 +203,10 @@ public class UserInterface extends Canvas implements Observer {
 
 	public Bitmaps getBitmaps() {
 		return bitmaps;
+	}
+	
+	public InputHandler getInputHandler() {
+		return inputHandler;
 	}
 
 }

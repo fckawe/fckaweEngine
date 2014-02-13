@@ -223,7 +223,7 @@ public class Frame extends JFrame implements WindowListener {
 
 	@Override
 	public void windowClosing(final WindowEvent e) {
-		Session.getSession().getHeart().requestExit();
+		Session.getSession().getHeart().requestStop();
 	}
 
 	@Override
