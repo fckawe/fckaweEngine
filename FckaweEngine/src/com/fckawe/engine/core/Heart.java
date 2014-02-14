@@ -1,6 +1,7 @@
 package com.fckawe.engine.core;
 
 import java.util.Observable;
+import java.util.Observer;
 
 // TODO: comment class and methods
 public class Heart extends Observable implements Runnable {
@@ -18,7 +19,7 @@ public class Heart extends Observable implements Runnable {
 
 	// Stuff for stats
 	// we'll be reading the stats every second
-	private final static int STAT_INTERVAL = 10000; // ms
+	private final static int STAT_INTERVAL = 1000; // ms
 	// the average will be calculated by storing
 	// the last n FPSs
 	private final static int FPS_HISTORY_NR = 10;
@@ -40,11 +41,11 @@ public class Heart extends Observable implements Runnable {
 	// the average FPS since the game started
 	private double averageFps = 0.0;
 
-	private boolean initializingFps = true;
-
 	private final StopListener stopListener;
 
 	private boolean exitRequested;
+	
+	private boolean hasNewObserver;
 
 	public Heart(final StopListener exitListener) {
 		this.stopListener = exitListener;
@@ -77,13 +78,13 @@ public class Heart extends Observable implements Runnable {
 			signalEvent(Event.SHOW);
 
 			timeDiff = System.nanoTime() - beginTime;
-			sleepTime = (int) (FRAME_PERIOD - timeDiff);
+			sleepTime = (int) ((FRAME_PERIOD - timeDiff) / 1000000);
 
 			if (sleepTime > 0) {
 				// if sleepTime > 0 we're OK
 				try {
 					// send the thread to sleep for a short
-					Thread.sleep(sleepTime / 1000000);
+					Thread.sleep(sleepTime);
 				} catch (InterruptedException e) {
 					Session.getSession().getHeartLogger()
 							.warn("Sleep interrupted.", e);
@@ -110,7 +111,10 @@ public class Heart extends Observable implements Runnable {
 			}
 
 			// calling the routine to store the gathered statistics
-			storeStats();
+			updateStats();
+			
+			hasNewObserver = false;
+			Thread.yield();
 		}
 
 		if (stopListener != null) {
@@ -143,11 +147,17 @@ public class Heart extends Observable implements Runnable {
 	 * start of the period are summed up and the calculation takes part only if
 	 * the next period and the frame count is reset to 0.
 	 */
-	private void storeStats() {
+	private void updateStats() {
+		double averageFpsBefore = averageFps;
+		
 		frameCountPerStatCycle++;
 
 		// check the actual time
 		statusIntervalTimer += (System.currentTimeMillis() - statusIntervalTimer);
+		
+		if(statsCount + 1 < FPS_HISTORY_NR) {
+			averageFps = TARGET_FPS;
+		}
 
 		if (statusIntervalTimer >= lastStatusStore + STAT_INTERVAL) {
 			// calculate the actual frames pers status check interval
@@ -159,22 +169,16 @@ public class Heart extends Observable implements Runnable {
 			// increase the number of times statistics was calculated
 			statsCount++;
 
-			double totalFps = 0.0;
-			// sum up the stored fps values
-			for (int i = 0; i < FPS_HISTORY_NR; i++) {
-				totalFps += fpsStore[i];
-			}
-
 			// obtain the average
-			if (statsCount < FPS_HISTORY_NR) {
-				if (!initializingFps) {
-					// in case of the first FPS_HISTORY_NR triggers
-					averageFps = totalFps / statsCount;
+			if (statsCount >= FPS_HISTORY_NR) {
+				double totalFps = 0.0;
+				// sum up the stored fps values
+				for (int i = 0; i < FPS_HISTORY_NR; i++) {
+					totalFps += fpsStore[i];
 				}
-			} else {
 				averageFps = totalFps / FPS_HISTORY_NR;
-				initializingFps = false;
 			}
+			
 			// saving the number of total frames skipped
 			totalFramesSkipped += framesSkippedPerStatCycle;
 			// resetting the counters after a status record (1 sec)
@@ -184,15 +188,21 @@ public class Heart extends Observable implements Runnable {
 
 			statusIntervalTimer = System.currentTimeMillis();
 			lastStatusStore = statusIntervalTimer;
-			signalEvent(Event.FPS_UPDATED, averageFps);
-		} else if (initializingFps) {
-			averageFps = TARGET_FPS;
+		}
+		
+		if(averageFps != averageFpsBefore || hasNewObserver) {
 			signalEvent(Event.FPS_UPDATED, averageFps);
 		}
 	}
 
 	public interface StopListener {
 		public void heartStopping();
+	}
+	
+	@Override
+	public void addObserver(final Observer observer) {
+		super.addObserver(observer);
+		hasNewObserver = true;
 	}
 
 	public void signalEvent(final Event event) {

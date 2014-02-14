@@ -41,6 +41,7 @@ public class BouncingBall extends Entity {
 			String globalId = getGlobalBitmapId(BMP_BOUNCING_BALL);
 			currentBitmap = bitmaps.getBitmap(globalId);
 		}
+		
 		InputHandler inputHandler = getInputHandler();
 		if (inputHandler != null && inputHandler.isPressed(KeyEvent.VK_RIGHT)) {
 			accelerateRight();
@@ -50,6 +51,7 @@ public class BouncingBall extends Entity {
 		} else {
 			accelX = 0;
 		}
+		
 		if (inputHandler != null && inputHandler.isPressed(KeyEvent.VK_UP)) {
 			accelerateUp();
 		} else if (inputHandler != null
@@ -58,6 +60,7 @@ public class BouncingBall extends Entity {
 		} else {
 			accelY = 0;
 		}
+		
 		super.tick();
 	}
 
@@ -68,22 +71,22 @@ public class BouncingBall extends Entity {
 
 	@Override
 	protected double getAccelerationSpeed() {
-		return 40;
+		return 0.1;
 	}
 
 	@Override
 	protected double getDecelerationSpeed() {
-		return 130;
+		return 0.02;
 	}
 
 	@Override
 	protected double getMaxAcceleration() {
-		return 200;
+		return 2;
 	}
 
 	@Override
 	protected double getMaxVelocity() {
-		return 200;
+		return 8;
 	}
 
 }

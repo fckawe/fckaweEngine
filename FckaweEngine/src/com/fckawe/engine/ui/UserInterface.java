@@ -4,6 +4,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.util.Observable;
 import java.util.Observer;
@@ -161,10 +162,11 @@ public class UserInterface extends Canvas implements Observer {
 
 		BufferStrategy bs = getBufferStrategy();
 		if (bs == null) {
-			createBufferStrategy(3);
+			createBufferStrategy(2);
 		} else {
 			Graphics g = bs.getDrawGraphics();
 			render(g);
+			g.dispose();
 		}
 	}
 
@@ -183,9 +185,10 @@ public class UserInterface extends Canvas implements Observer {
 
 	private void showRenderedImage() {
 		BufferStrategy bs = getBufferStrategy();
-		if (bs != null) {
+		if (bs != null && !bs.contentsLost()) {
 			bs.show();
 		}
+        Toolkit.getDefaultToolkit().sync();
 	}
 
 	public Screen getScreen() {
@@ -193,7 +196,9 @@ public class UserInterface extends Canvas implements Observer {
 	}
 
 	public void tick() {
-		inputHandler.tick();
+		if(inputHandler != null) {
+			inputHandler.tick();
+		}
 		game.tick(inputHandler);
 	}
 

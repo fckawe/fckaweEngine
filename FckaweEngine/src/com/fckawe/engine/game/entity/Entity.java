@@ -44,8 +44,8 @@ public abstract class Entity {
 
 	public void tick() {
 		double fps = game.getUserInterface().getCurrentFps();
-		velX += accelX / Math.max(fps, 1);
-		velY += accelY / Math.max(fps, 1);
+		velX += accelX;
+		velY += accelY;
 		double maxVel = getMaxVelocity();
 		if (Math.abs(velX) > maxVel) {
 			velX = velX < 0 ? maxVel * -1 : maxVel;
@@ -53,12 +53,16 @@ public abstract class Entity {
 		if (Math.abs(velY) > maxVel) {
 			velY = velY < 0 ? maxVel * -1 : maxVel;
 		}
-		posX += velX / Math.max(fps, 1);
-		posY += velY / Math.max(fps, 1);
+//		posX += velX / Math.max(fps, 1);
+//		posY += velY / Math.max(fps, 1);
+		posX += velX;
+		posY += velY;
 	}
 
 	public void render(final Screen screen) {
-		screen.blit(currentBitmap, posX, posY);
+		if(currentBitmap != null) {
+			screen.blit(currentBitmap, posX, posY);
+		}
 	}
 
 	protected Bitmaps getBitmaps() {
