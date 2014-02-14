@@ -9,74 +9,22 @@ package com.fckawe.engine.input;
  */
 public class KeyState {
 
-	/**
-	 * Bit value for the shift hold key state.
-	 */
-	public static final short HELD_SHIFT = 1;
-
-	/**
-	 * Bit value for the control hold key state.
-	 */
-	public static final short HELD_CONTROL = 2;
-
-	/**
-	 * Bit value for the alt hold key state.
-	 */
-	public static final short HELD_ALT = 4;
-
-	/**
-	 * Bit value for the altgr hold key state.
-	 */
-	public static final short HELD_ALT_GR = 8;
-
-	/**
-	 * Bit value for the meta hold key state.
-	 */
-	public static final short HELD_META = 16;
-
 	private boolean pressed;
-	private short heldKey;
+	private int modifiers;
 	private boolean nextPressed;
-	private short nextHeldKey;
+	private int nextModifiers;
 
 	/**
 	 * Sets the next key state that will get activated with the next tick.
 	 * 
 	 * @param pressed
 	 *            True, if the key was pressed, false if it was released.
-	 * @param withShift
-	 *            True, if the key was pressed while holding the shift key down.
-	 * @param withControl
-	 *            True, if the key was pressed while holding the control key
-	 *            down.
-	 * @param withAlt
-	 *            True, if the key was pressed while holding the alt key down.
-	 * @param withAltGr
-	 *            True, if the key was pressed while holding the altgr key down.
-	 * @param withMeta
-	 *            True, if the key was pressed while holding the meta key down.
+	 * @param modifiers
+	 *            The modifiers bit mask.
 	 */
-	public void setNextState(final boolean pressed, final boolean withShift,
-			final boolean withControl, final boolean withAlt,
-			final boolean withAltGr, final boolean withMeta) {
+	public void setNextState(final boolean pressed, final int modifiers) {
 		nextPressed = pressed;
-
-		nextHeldKey = 0;
-		if (withShift) {
-			nextHeldKey |= HELD_SHIFT;
-		}
-		if (withControl) {
-			nextHeldKey |= HELD_CONTROL;
-		}
-		if (withAlt) {
-			nextHeldKey |= HELD_ALT;
-		}
-		if (withAltGr) {
-			nextHeldKey |= HELD_ALT_GR;
-		}
-		if (withMeta) {
-			nextHeldKey |= HELD_META;
-		}
+		nextModifiers = modifiers;
 	}
 
 	/**
@@ -85,7 +33,7 @@ public class KeyState {
 	 */
 	public void tick() {
 		pressed = nextPressed;
-		heldKey = nextHeldKey;
+		modifiers = nextModifiers;
 	}
 
 	/**
@@ -94,9 +42,7 @@ public class KeyState {
 	 */
 	public void consume() {
 		pressed = false;
-		heldKey = 0;
-		nextPressed = false;
-		nextHeldKey = 0;
+		modifiers = 0;
 	}
 
 	/**
@@ -112,19 +58,17 @@ public class KeyState {
 	 * Returns true, if the key was pressed while holding the keys down, which
 	 * are specified with the heldKey bits.
 	 * 
-	 * @param heldKey
-	 *            The bit mask specifying the held keys that should be held down
-	 *            while pressing the key.
+	 * @param modifiers
+	 *            Modifiers bit mask (see KeyEvent constants).
 	 * @return True, if the key was pressed while holding the specified held
 	 *         keys.
 	 */
-	public boolean isPressedWith(final short heldKey) {
+	public boolean isPressedWith(final int modifiers) {
 		if (pressed) {
-			if (this.heldKey == 0 && heldKey == 0) {
-				return true;
-			} else if ((this.heldKey - heldKey) == 0) {
+			if (this.modifiers == 0 && modifiers == 0) {
 				return true;
 			}
+			return this.modifiers == modifiers;
 		}
 		return false;
 	}

@@ -44,7 +44,7 @@ public class Heart extends Observable implements Runnable {
 	private final StopListener stopListener;
 
 	private boolean exitRequested;
-	
+
 	private boolean hasNewObserver;
 
 	public Heart(final StopListener exitListener) {
@@ -64,6 +64,7 @@ public class Heart extends Observable implements Runnable {
 		Session.getSession().getHeartLogger().info("Heart started.");
 
 		initTimingElements();
+		long currentTime = System.currentTimeMillis();
 		long beginTime; // the time when the cycle begun
 		long timeDiff; // the time it took for the cycle to execute
 		int sleepTime = 0; // ms to sleep (<0 if we're behind)
@@ -73,7 +74,10 @@ public class Heart extends Observable implements Runnable {
 			beginTime = System.nanoTime();
 			framesSkipped = 0;
 
-			signalEvent(Event.TICK);
+			long elapsedTime = System.currentTimeMillis() - currentTime;
+			currentTime += elapsedTime;
+
+			signalEvent(Event.TICK, elapsedTime);
 			signalEvent(Event.RENDER);
 			signalEvent(Event.SHOW);
 
@@ -92,9 +96,11 @@ public class Heart extends Observable implements Runnable {
 			}
 
 			while (sleepTime < 0 && framesSkipped < MAX_FRAME_SKIPS) {
+				elapsedTime = System.currentTimeMillis() - currentTime;
+				currentTime += elapsedTime;
 				// we need to catch up
 				// update without rendering
-				signalEvent(Event.TICK);
+				signalEvent(Event.TICK, elapsedTime);
 				// add frame period to check if in next frame
 				sleepTime += FRAME_PERIOD;
 				framesSkipped++;
@@ -112,7 +118,7 @@ public class Heart extends Observable implements Runnable {
 
 			// calling the routine to store the gathered statistics
 			updateStats();
-			
+
 			hasNewObserver = false;
 			Thread.yield();
 		}
@@ -149,13 +155,13 @@ public class Heart extends Observable implements Runnable {
 	 */
 	private void updateStats() {
 		double averageFpsBefore = averageFps;
-		
+
 		frameCountPerStatCycle++;
 
 		// check the actual time
 		statusIntervalTimer += (System.currentTimeMillis() - statusIntervalTimer);
-		
-		if(statsCount + 1 < FPS_HISTORY_NR) {
+
+		if (statsCount + 1 < FPS_HISTORY_NR) {
 			averageFps = TARGET_FPS;
 		}
 
@@ -178,7 +184,7 @@ public class Heart extends Observable implements Runnable {
 				}
 				averageFps = totalFps / FPS_HISTORY_NR;
 			}
-			
+
 			// saving the number of total frames skipped
 			totalFramesSkipped += framesSkippedPerStatCycle;
 			// resetting the counters after a status record (1 sec)
@@ -189,8 +195,8 @@ public class Heart extends Observable implements Runnable {
 			statusIntervalTimer = System.currentTimeMillis();
 			lastStatusStore = statusIntervalTimer;
 		}
-		
-		if(averageFps != averageFpsBefore || hasNewObserver) {
+
+		if (averageFps != averageFpsBefore || hasNewObserver) {
 			signalEvent(Event.FPS_UPDATED, averageFps);
 		}
 	}
@@ -198,7 +204,7 @@ public class Heart extends Observable implements Runnable {
 	public interface StopListener {
 		public void heartStopping();
 	}
-	
+
 	@Override
 	public void addObserver(final Observer observer) {
 		super.addObserver(observer);
@@ -210,7 +216,7 @@ public class Heart extends Observable implements Runnable {
 		Heart.this.notifyObservers(event);
 	}
 
-	public void signalEvent(final Event event, final double value) {
+	public void signalEvent(final Event event, final Object value) {
 		Heart.this.setChanged();
 		EventData data = new EventData(event, value);
 		Heart.this.notifyObservers(data);

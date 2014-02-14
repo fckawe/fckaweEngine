@@ -26,9 +26,9 @@ public class Game {
 		return module;
 	}
 
-	public void tick(final InputHandler inputHandler) {
+	public void tick(final InputHandler inputHandler, final long elapsedTime) {
 		if (module != null) {
-			module.tick(inputHandler);
+			module.tick(inputHandler, elapsedTime);
 			if (module.isEnded()) {
 				setModule(module.getContinueWithModule());
 			}

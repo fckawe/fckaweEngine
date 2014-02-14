@@ -71,13 +71,13 @@ public class InputHandler implements KeyListener {
 	}
 
 	private void toggle(final KeyEvent event, final boolean pressed) {
-		KeyState key = keyMap.get(event.getKeyCode());
-		if (key != null) {
-			key.setNextState(pressed, event.isShiftDown(),
-					event.isControlDown(), event.isAltDown(),
-					event.isAltGraphDown(), event.isMetaDown());
+		if (!event.isConsumed()) {
+			KeyState key = keyMap.get(event.getKeyCode());
+			if (key != null) {
+				key.setNextState(pressed, event.getModifiers());
+				event.consume();
+			}
 		}
-
 	}
 
 	/**

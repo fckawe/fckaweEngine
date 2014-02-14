@@ -42,10 +42,16 @@ public abstract class Entity {
 
 	public abstract void loadRequiredBitmap(String id);
 
-	public void tick() {
-		double fps = game.getUserInterface().getCurrentFps();
-		velX += accelX;
-		velY += accelY;
+	public void tick(final InputHandler inputHandler, final long elapsedTime) {
+		long divisor = Math.max(elapsedTime, 1);
+
+		if (accelY >= 0) {
+			double gravity = getGravity();
+			velY += gravity * elapsedTime;
+		}
+
+		velX += accelX / divisor;
+		velY += accelY / divisor;
 		double maxVel = getMaxVelocity();
 		if (Math.abs(velX) > maxVel) {
 			velX = velX < 0 ? maxVel * -1 : maxVel;
@@ -53,14 +59,14 @@ public abstract class Entity {
 		if (Math.abs(velY) > maxVel) {
 			velY = velY < 0 ? maxVel * -1 : maxVel;
 		}
-//		posX += velX / Math.max(fps, 1);
-//		posY += velY / Math.max(fps, 1);
-		posX += velX;
-		posY += velY;
+		posX += velX / divisor;
+		posY += velY / divisor;
+
+		checkScreenCollision();
 	}
 
 	public void render(final Screen screen) {
-		if(currentBitmap != null) {
+		if (currentBitmap != null) {
 			screen.blit(currentBitmap, posX, posY);
 		}
 	}
@@ -131,4 +137,15 @@ public abstract class Entity {
 
 	protected abstract double getMaxVelocity();
 
+	protected abstract double getGravity();
+
+	protected void checkScreenCollision() {
+		Screen screen = game.getUserInterface().getScreen();
+		int borderBottom = screen.getHeight() - currentBitmap.getHeight();
+		if (posY >= borderBottom) {
+			posY = borderBottom;
+			// accelY *= -0.7;
+			// velY *= -0.9;
+		}
+	}
 }

@@ -35,33 +35,36 @@ public class BouncingBall extends Entity {
 	}
 
 	@Override
-	public void tick() {
+	public void tick(final InputHandler inputHandler, final long elapsedTime) {
 		if (currentBitmap == null) {
 			Bitmaps bitmaps = getBitmaps();
 			String globalId = getGlobalBitmapId(BMP_BOUNCING_BALL);
 			currentBitmap = bitmaps.getBitmap(globalId);
 		}
-		
-		InputHandler inputHandler = getInputHandler();
+
 		if (inputHandler != null && inputHandler.isPressed(KeyEvent.VK_RIGHT)) {
+			inputHandler.consume(KeyEvent.VK_RIGHT);
 			accelerateRight();
 		} else if (inputHandler != null
 				&& inputHandler.isPressed(KeyEvent.VK_LEFT)) {
+			inputHandler.consume(KeyEvent.VK_LEFT);
 			accelerateLeft();
 		} else {
 			accelX = 0;
 		}
-		
+
 		if (inputHandler != null && inputHandler.isPressed(KeyEvent.VK_UP)) {
+			inputHandler.consume(KeyEvent.VK_UP);
 			accelerateUp();
 		} else if (inputHandler != null
 				&& inputHandler.isPressed(KeyEvent.VK_DOWN)) {
+			inputHandler.consume(KeyEvent.VK_DOWN);
 			accelerateDown();
 		} else {
 			accelY = 0;
 		}
-		
-		super.tick();
+
+		super.tick(inputHandler, elapsedTime);
 	}
 
 	@Override
@@ -71,22 +74,27 @@ public class BouncingBall extends Entity {
 
 	@Override
 	protected double getAccelerationSpeed() {
-		return 0.1;
+		return 50;
 	}
 
 	@Override
 	protected double getDecelerationSpeed() {
-		return 0.02;
+		return 50;
 	}
 
 	@Override
 	protected double getMaxAcceleration() {
-		return 2;
+		return 200;
 	}
 
 	@Override
 	protected double getMaxVelocity() {
-		return 8;
+		return 200;
+	}
+
+	@Override
+	protected double getGravity() {
+		return 1.001;
 	}
 
 }

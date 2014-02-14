@@ -45,14 +45,14 @@ public abstract class Module {
 		if (logger != null && logger.isInfoEnabled()) {
 			logger.info("Load resources for module '{}'.", name);
 		}
-		
+
 		entities.clear();
 		loadEntities();
 
-		for(String entityId : entities.keySet()) {
+		for (String entityId : entities.keySet()) {
 			Entity entity = entities.get(entityId);
 			List<String> bmpIds = entity.getRequiredBitmapIds();
-			for(String bmpId : bmpIds) {
+			for (String bmpId : bmpIds) {
 				entity.loadRequiredBitmap(bmpId);
 			}
 		}
@@ -66,14 +66,14 @@ public abstract class Module {
 		// TODO: remove bitmaps
 	}
 
-	public void tick(final InputHandler inputHandler) {
-		for(Entity entity : entities.values()) {
-			entity.tick();
+	public void tick(final InputHandler inputHandler, final long elapsedTime) {
+		for (Entity entity : entities.values()) {
+			entity.tick(inputHandler, elapsedTime);
 		}
 	}
-	
+
 	public void render(final Screen screen) {
-		for(Entity entity : entities.values()) {
+		for (Entity entity : entities.values()) {
 			entity.render(screen);
 		}
 	}

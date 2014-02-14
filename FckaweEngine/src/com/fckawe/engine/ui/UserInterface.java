@@ -26,6 +26,8 @@ public class UserInterface extends Canvas implements Observer {
 
 	private Frame frame;
 	private final Screen screen;
+	private int screenTranslatedX;
+	private int screenTranslatedY;
 	private double screenScale;
 	private Dimension uiDimension;
 	private double framesPerSecond;
@@ -46,6 +48,8 @@ public class UserInterface extends Canvas implements Observer {
 		setBackground(Color.BLACK);
 
 		Dimension screenDimension = getScreenDimension(uiDimension);
+		screenTranslatedX = (int) (getWidth() - uiDimension.getWidth()) / 2;
+		screenTranslatedY = (int) (getHeight() - uiDimension.getHeight()) / 2;
 		screen = new Screen(screenDimension);
 
 		initGrafix();
@@ -133,7 +137,8 @@ public class UserInterface extends Canvas implements Observer {
 				requestFocus();
 				break;
 			case TICK:
-				tick();
+				long elapsedTime = (Long) eventData;
+				tick(elapsedTime);
 				break;
 			case RENDER:
 				render();
@@ -174,10 +179,7 @@ public class UserInterface extends Canvas implements Observer {
 		int width = (int) uiDimension.getWidth();
 		int height = (int) uiDimension.getHeight();
 
-		int translateX = (getWidth() - width) / 2;
-		int translateY = (getHeight() - height) / 2;
-
-		g.translate(translateX, translateY);
+		g.translate(screenTranslatedX, screenTranslatedY);
 		g.clipRect(0, 0, width, height);
 
 		g.drawImage(screen.getImage(), 0, 0, width, height, null);
@@ -188,18 +190,18 @@ public class UserInterface extends Canvas implements Observer {
 		if (bs != null && !bs.contentsLost()) {
 			bs.show();
 		}
-        Toolkit.getDefaultToolkit().sync();
+		Toolkit.getDefaultToolkit().sync();
 	}
 
 	public Screen getScreen() {
 		return screen;
 	}
 
-	public void tick() {
-		if(inputHandler != null) {
+	public void tick(final long elapsedTime) {
+		if (inputHandler != null) {
 			inputHandler.tick();
 		}
-		game.tick(inputHandler);
+		game.tick(inputHandler, elapsedTime);
 	}
 
 	public Font getFont(final String fontName) {

@@ -27,8 +27,8 @@ public class BouncingBallDemo extends Module {
 	}
 
 	@Override
-	public void tick(final InputHandler inputHandler) {
-		super.tick(inputHandler);
+	public void tick(final InputHandler inputHandler, final long elapsedTime) {
+		super.tick(inputHandler, elapsedTime);
 
 		if (inputHandler.isPressed(KeyEvent.VK_ESCAPE)) {
 			inputHandler.consume(KeyEvent.VK_ESCAPE);
