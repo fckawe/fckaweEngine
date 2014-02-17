@@ -14,21 +14,46 @@ public abstract class Entity {
 
 	protected Bitmap currentBitmap;
 
-	protected int posX;
+	protected int pX;
 
-	protected int posY;
+	protected int pY;
 
-	protected double velX;
+	protected double vX;
 
-	protected double velY;
+	protected double vY;
 
-	protected double accelX;
+	protected double aX;
 
-	protected double accelY;
+	protected double aY;
+
+	private double accelerationSpeed;
+
+	private double decelerationSpeed;
+
+	private double maxAcceleration;
+
+	private double maxVelocity;
+
+	private double frictionX;
+
+	private double frictionY;
 
 	public Entity(final Game game) {
 		this.game = game;
+		initDefaults();
+		init();
 	}
+
+	protected void initDefaults() {
+		accelerationSpeed = 50;
+		decelerationSpeed = 50;
+		maxAcceleration = 200;
+		maxVelocity = 200;
+		frictionX = 1;
+		frictionY = 1;
+	}
+
+	protected abstract void init();
 
 	protected String getBitmapsIdPrefix() {
 		return getClass().getName();
@@ -45,29 +70,56 @@ public abstract class Entity {
 	public void tick(final InputHandler inputHandler, final long elapsedTime) {
 		long divisor = Math.max(elapsedTime, 1);
 
-		if (accelY >= 0) {
-			double gravity = getGravity();
-			velY += gravity * elapsedTime;
+		// limit acceleration
+		aX = limitDoubleToMax(aX, maxAcceleration);
+		aY = limitDoubleToMax(aY, maxAcceleration);
+
+		if (aX == 0) {
+			if (frictionX != 0) {
+				// slow down (friction)
+				if (vX > 0) {
+					vX -= (vX < frictionX) ? 0 : frictionX;
+				} else if (vX < 0) {
+					vX += (Math.abs(vX) < frictionX) ? 0 : frictionX;
+				}
+			}
+		} else {
+			// speed up
+			vX += aX / divisor;
+		}
+		if (aY == 0) {
+			if (frictionY != 0) {
+				// slow down (friction)
+				if (vY > 0) {
+					vY -= vY < frictionY ? 0 : frictionY;
+				} else if (vY < 0) {
+					vY += Math.abs(vY) < frictionY ? 0 : frictionY;
+				}
+			}
+		} else {
+			// speed up
+			vY += aY / divisor;
 		}
 
-		velX += accelX / divisor;
-		velY += accelY / divisor;
-		double maxVel = getMaxVelocity();
-		if (Math.abs(velX) > maxVel) {
-			velX = velX < 0 ? maxVel * -1 : maxVel;
-		}
-		if (Math.abs(velY) > maxVel) {
-			velY = velY < 0 ? maxVel * -1 : maxVel;
-		}
-		posX += velX / divisor;
-		posY += velY / divisor;
+		// limit velocity
+		vX = limitDoubleToMax(vX, maxVelocity);
+		vY = limitDoubleToMax(vY, maxVelocity);
 
-		checkScreenCollision();
+		// update position
+		pX += vX / divisor;
+		pY += vY / divisor;
+	}
+
+	protected double limitDoubleToMax(final double val, final double max) {
+		if (Math.abs(val) > max) {
+			return val < 0 ? max * -1 : max;
+		}
+		return val;
 	}
 
 	public void render(final Screen screen) {
 		if (currentBitmap != null) {
-			screen.blit(currentBitmap, posX, posY);
+			screen.blit(currentBitmap, pX, pY);
 		}
 	}
 
@@ -79,73 +131,68 @@ public abstract class Entity {
 		return game.getUserInterface().getInputHandler();
 	}
 
-	protected void accelerateRight() {
-		if (velX < 0) {
-			accelX += getDecelerationSpeed();
-		} else {
-			accelX += getAccelerationSpeed();
-		}
-
-		double maxAccel = getMaxAcceleration();
-		if (Math.abs(accelX) > maxAccel) {
-			accelX = accelX < 0 ? maxAccel * -1 : maxAccel;
+	protected void accelerateX(final int dir) {
+		if (dir > 0) { // right
+			aX += accelerationSpeed;
+		} else if (dir < 0) { // left
+			aX -= accelerationSpeed;
 		}
 	}
 
-	protected void accelerateLeft() {
-		if (velX > 0) {
-			accelX -= getDecelerationSpeed();
-		} else {
-			accelX -= getAccelerationSpeed();
-		}
-		double maxAccel = getMaxAcceleration();
-		if (Math.abs(accelX) > maxAccel) {
-			accelX = accelX < 0 ? maxAccel * -1 : maxAccel;
+	protected void accelerateY(final int dir) {
+		if (dir > 0) { // down
+			aY += accelerationSpeed;
+		} else if (dir < 0) { // up
+			aY -= accelerationSpeed;
 		}
 	}
 
-	protected void accelerateUp() {
-		if (velY > 0) {
-			accelY -= getDecelerationSpeed();
-		} else {
-			accelY -= getAccelerationSpeed();
-		}
-		double maxAccel = getMaxAcceleration();
-		if (Math.abs(accelY) > maxAccel) {
-			accelY = accelY < 0 ? maxAccel * -1 : maxAccel;
-		}
-	}
-
-	protected void accelerateDown() {
-		if (velY < 0) {
-			accelY += getDecelerationSpeed();
-		} else {
-			accelY += getAccelerationSpeed();
-		}
-
-		double maxAccel = getMaxAcceleration();
-		if (Math.abs(accelY) > maxAccel) {
-			accelY = accelY < 0 ? maxAccel * -1 : maxAccel;
+	protected void decelerateX() {
+		if (aX > decelerationSpeed) {
+			aX -= decelerationSpeed;
+		} else if (aX > 0) {
+			aX = 0;
+		} else if (Math.abs(aX) < decelerationSpeed) {
+			aX += decelerationSpeed;
+		} else if (aX < 0) {
+			aX = 0;
 		}
 	}
 
-	protected abstract double getAccelerationSpeed();
-
-	protected abstract double getDecelerationSpeed();
-
-	protected abstract double getMaxAcceleration();
-
-	protected abstract double getMaxVelocity();
-
-	protected abstract double getGravity();
-
-	protected void checkScreenCollision() {
-		Screen screen = game.getUserInterface().getScreen();
-		int borderBottom = screen.getHeight() - currentBitmap.getHeight();
-		if (posY >= borderBottom) {
-			posY = borderBottom;
-			// accelY *= -0.7;
-			// velY *= -0.9;
+	protected void decelerateY() {
+		if (aY > decelerationSpeed) {
+			aY -= decelerationSpeed;
+		} else if (aY > 0) {
+			aY = 0;
+		} else if (Math.abs(aY) < decelerationSpeed) {
+			aY += decelerationSpeed;
+		} else if (aY < 0) {
+			aY = 0;
 		}
 	}
+
+	protected void setAccelerationSpeed(final double accelerationSpeed) {
+		this.accelerationSpeed = accelerationSpeed;
+	}
+
+	protected void setDecelerationSpeed(final double decelerationSpeed) {
+		this.decelerationSpeed = decelerationSpeed;
+	}
+
+	protected void setMaxAcceleration(final double maxAcceleration) {
+		this.maxAcceleration = maxAcceleration;
+	}
+
+	protected void setMaxVelocity(final double maxVelocity) {
+		this.maxVelocity = maxVelocity;
+	}
+
+	protected void setFrictionX(final double frictionX) {
+		this.frictionX = frictionX;
+	}
+
+	protected void setFrictionY(final double frictionY) {
+		this.frictionY = frictionY;
+	}
+
 }
