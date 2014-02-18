@@ -2,8 +2,8 @@ package com.fckawe.engine.game.entity;
 
 import java.util.List;
 
-import com.fckawe.engine.core.Vector;
 import com.fckawe.engine.core.Position;
+import com.fckawe.engine.core.Vector;
 import com.fckawe.engine.game.Game;
 import com.fckawe.engine.grafix.Bitmap;
 import com.fckawe.engine.grafix.Bitmaps;
@@ -15,27 +15,25 @@ public abstract class Entity {
 	protected Game game;
 
 	protected Bitmap currentBitmap;
-	
+
 	protected Position pos;
-	
+
 	protected Vector velocity;
-	
+
 	protected Vector acceleration;
-	
+
 	protected Vector accelerationSpeed;
-	
+
 	protected Vector decelerationSpeed;
 
 	protected Vector accelerationMax;
-	
+
 	protected Vector velocityMax;
-	
+
 	protected Vector friction;
 
-	protected boolean canMoveX;
-	
-	protected boolean canMoveY;
-	
+	protected Vector weight;
+
 	public Entity(final Game game) {
 		this.game = game;
 		initDefaults();
@@ -51,8 +49,7 @@ public abstract class Entity {
 		accelerationMax = new Vector(200, 200);
 		velocityMax = new Vector(200, 200);
 		friction = new Vector(1, 1);
-		canMoveX = true;
-		canMoveY = true;
+		weight = new Vector(0, 100);
 	}
 
 	protected abstract void init();
@@ -73,43 +70,47 @@ public abstract class Entity {
 		long divisor = Math.max(elapsedTime, 1);
 		velocity.applyDivisor(divisor);
 		acceleration.applyDivisor(divisor);
-		
-		if(canMoveX) {
-			// limit acceleration
-			acceleration.applyMaxX(accelerationMax.getX());
-			if (acceleration.getX() == 0) {
-				// slow down (friction)
-				velocity.xTowardsZero(friction.getX());
-			} else {
-				// speed up
-				velocity.increaseX(acceleration);
-			}
-			// limit velocity
-			velocity.applyMaxX(velocityMax.getX());
-		} else {
-			acceleration.setX(0);
-			velocity.setX(0);
+		weight.applyDivisor(divisor);
+
+		if (weight.getY() != 0) {
+			acceleration.increaseY(weight.getY());
 		}
-		
-		if(canMoveY) {
-			// limit acceleration
-			acceleration.applyMaxY(accelerationMax.getY());
-			if (acceleration.getY() == 0) {
-				// slow down (friction)
-				velocity.yTowardsZero(friction.getY());
-			} else {
-				// speed up
-				velocity.increaseY(acceleration);
-			}
-			// limit velocity
-			velocity.applyMaxY(velocityMax.getY());
-		} else {
-			acceleration.setY(0);
-			velocity.setY(0);
-		}
-		
+
+		processMovementX();
+		processMovementY();
+
 		// update position
 		pos.move(velocity);
+
+		checkBorderCollision();
+	}
+
+	protected void processMovementX() {
+		// limit acceleration
+		acceleration.applyMaxX(accelerationMax.getX());
+		if (acceleration.getX() == 0) {
+			// slow down (friction)
+			velocity.xTowardsZero(friction.getX());
+		} else {
+			// speed up
+			velocity.increaseX(acceleration);
+		}
+		// limit velocity
+		velocity.applyMaxX(velocityMax.getX());
+	}
+
+	protected void processMovementY() {
+		// limit acceleration
+		acceleration.applyMaxY(accelerationMax.getY());
+		if (acceleration.getY() == 0) {
+			// slow down (friction)
+			velocity.yTowardsZero(friction.getY());
+		} else {
+			// speed up
+			velocity.increaseY(acceleration);
+		}
+		// limit velocity
+		velocity.applyMaxY(velocityMax.getY());
 	}
 
 	public void render(final Screen screen) {
@@ -148,6 +149,72 @@ public abstract class Entity {
 
 	protected void decelerateY() {
 		acceleration.yTowardsZero(decelerationSpeed.getY());
+	}
+
+	protected void checkBorderCollision() {
+		int x = pos.getX();
+		int mostLeft = getMostLeftPosition();
+		if (x < mostLeft) {
+			collisionWithLeftBorder(mostLeft);
+		} else {
+			int mostRight = getMostRightPosition();
+			if (x > mostRight) {
+				collisionWithRightBorder(mostRight);
+			}
+		}
+
+		int y = pos.getY();
+		int mostTop = getMostTopPosition();
+		if (y < mostTop) {
+			collisionWithTopBorder(mostTop);
+		} else {
+			int mostBottom = getMostBottomPosition();
+			if (y > mostBottom) {
+				collisionWithBottomBorder(mostBottom);
+			}
+		}
+	}
+
+	protected int getMostLeftPosition() {
+		return 0;
+	}
+
+	protected int getMostRightPosition() {
+		Screen screen = game.getUserInterface().getScreen();
+		return screen.getWidth() - currentBitmap.getWidth();
+	}
+
+	protected int getMostTopPosition() {
+		return 0;
+	}
+
+	protected int getMostBottomPosition() {
+		Screen screen = game.getUserInterface().getScreen();
+		return screen.getHeight() - currentBitmap.getHeight();
+	}
+
+	protected void collisionWithLeftBorder(final int mostLeft) {
+		pos.setX(mostLeft);
+		acceleration.setX(0);
+		velocity.setX(0);
+	}
+
+	protected void collisionWithRightBorder(final int mostRight) {
+		pos.setX(mostRight);
+		acceleration.setX(0);
+		velocity.setX(0);
+	}
+
+	protected void collisionWithTopBorder(final int mostTop) {
+		pos.setY(mostTop);
+		acceleration.setY(0);
+		velocity.setY(0);
+	}
+
+	protected void collisionWithBottomBorder(final int mostBottom) {
+		pos.setY(mostBottom);
+		acceleration.setY(0);
+		velocity.setY(0);
 	}
 
 }

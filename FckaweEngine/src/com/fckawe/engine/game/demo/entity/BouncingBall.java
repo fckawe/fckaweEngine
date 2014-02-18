@@ -26,8 +26,6 @@ public class BouncingBall extends Entity {
 		accelerationMax = new Vector(200, 200);
 		velocityMax = new Vector(200, 200);
 		friction = new Vector(10, 10);
-		canMoveX = true;
-		canMoveY = true;
 	}
 
 	@Override
@@ -82,6 +80,15 @@ public class BouncingBall extends Entity {
 	@Override
 	public void render(final Screen screen) {
 		super.render(screen);
+	}
+
+	@Override
+	protected void collisionWithBottomBorder(final int mostBottom) {
+		double newAccelerationY = acceleration.getDirectY() * -0.9;
+
+		super.collisionWithBottomBorder(mostBottom);
+
+		acceleration.setY(newAccelerationY);
 	}
 
 }
