@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
+import com.fckawe.engine.core.Position;
 import com.fckawe.engine.core.Session;
 import com.fckawe.engine.ui.Screen;
 import com.fckawe.engine.ui.UserInterface;
@@ -93,14 +94,12 @@ public class Fonts {
 	 *            The screen.
 	 * @param message
 	 *            The message string to be drawn.
-	 * @param startX
-	 *            The x-coordinate.
-	 * @param startY
-	 *            The y-coordinate.
+	 * @param start
+	 *            The starting position.
 	 */
 	public void draw(final Screen screen, final String message,
-			final int startX, final int startY) {
-		drawMulti(screen, null, message, startX, startY, -1);
+			final Position start) {
+		drawMulti(screen, null, message, start, -1);
 	}
 
 	/**
@@ -112,14 +111,12 @@ public class Fonts {
 	 *            The name of the font to use.
 	 * @param message
 	 *            The message string to be drawn.
-	 * @param startX
-	 *            The x-coordinate.
-	 * @param startY
-	 *            The y-coordinate.
+	 * @param start
+	 *            The starting position.
 	 */
 	public void draw(final Screen screen, final String fontName,
-			final String message, final int startX, final int startY) {
-		drawMulti(screen, fontName, message, startX, startY, -1);
+			final String message, final Position start) {
+		drawMulti(screen, fontName, message, start, -1);
 	}
 
 	/**
@@ -133,15 +130,13 @@ public class Fonts {
 	 *            The name of the font to use.
 	 * @param message
 	 *            The message string to be drawn.
-	 * @param startX
-	 *            The x-coordinate.
-	 * @param startY
-	 *            The y-coordinate.
+	 * @param start
+	 *            The starting position.
 	 * @param maxWidth
 	 *            The maximum with for the text or -1 if "unlimited".
 	 */
 	public void drawMulti(final Screen screen, final String fontName,
-			final String message, final int startX, final int startY,
+			final String message, final Position start,
 			final int maxWidth) {
 		int width = maxWidth < 0 ? screen.getWidth() : maxWidth;
 		Font font = ui.getFont(fontName);
@@ -152,12 +147,12 @@ public class Fonts {
 		String msg = font.hasLowercaseLetters() ? message : message
 				.toUpperCase();
 		int length = msg.length();
-		int posX = startX;
-		int posY = startY;
+		int posX = start.getX();
+		int posY = start.getY();
 		for (int i = 0; i < length; i++) {
 			char c = msg.charAt(i);
 			if (c == '\n') {
-				posX = startX;
+				posX = start.getX();
 				posY += fontHeight + lineSpacing;
 				continue;
 			}
@@ -165,10 +160,11 @@ public class Fonts {
 			if (charBitmap == null) {
 				continue;
 			}
-			screen.blit(charBitmap, posX, posY);
+			Position pos = new Position(posX, posY);
+			screen.blit(charBitmap, pos);
 			posX += fontWidth + letterSpacing;
 			if (posX > width) {
-				posX = startX;
+				posX = start.getX();
 				posY += fontHeight + lineSpacing;
 			}
 		}
@@ -183,8 +179,7 @@ public class Fonts {
 	 *            The message string to be drawn.
 	 */
 	public void drawCentered(final Screen screen, final String message) {
-		drawCentered(screen, message, screen.getWidth() / 2,
-				screen.getHeight() / 2);
+		drawCentered(screen, DEFAULT_FONT, message);
 	}
 
 	/**
@@ -195,14 +190,12 @@ public class Fonts {
 	 *            The screen.
 	 * @param message
 	 *            The message string to be drawn.
-	 * @param centerPosX
-	 *            The center position x-coordinate.
-	 * @param centerPosY
-	 *            The center position y-coordinate.
+	 * @param centerPos
+	 *            The center position.
 	 */
 	public void drawCentered(final Screen screen, final String message,
-			final int centerPosX, final int centerPosY) {
-		drawCentered(screen, null, message, centerPosX, centerPosY);
+			final Position centerPos) {
+		drawCentered(screen, DEFAULT_FONT, message, centerPos);
 	}
 
 	/**
@@ -217,8 +210,10 @@ public class Fonts {
 	 */
 	public void drawCentered(final Screen screen, final String fontName,
 			final String message) {
-		drawCentered(screen, fontName, message, screen.getWidth() / 2,
-				screen.getHeight() / 2);
+		int posX = screen.getWidth() / 2;
+		int posY = screen.getHeight() / 2;
+		Position pos = new Position(posX, posY);
+		drawCentered(screen, fontName, message, pos);
 	}
 
 	/**
@@ -231,18 +226,18 @@ public class Fonts {
 	 *            The name of the font to use.
 	 * @param message
 	 *            The message string to be drawn.
-	 * @param centerPosX
-	 *            The center position x-coordinate.
-	 * @param centerPosY
-	 *            The center position y-coordinate.
+	 * @param centerPos
+	 *            The center position.
 	 */
 	public void drawCentered(final Screen screen, final String fontName,
-			final String message, final int centerPosX, final int centerPosY) {
+			final String message, final Position centerPos) {
 		Font font = ui.getFont(fontName);
 		int fontWidth = font.getStringWidth(message);
 		int fontHeight = font.getHeight();
-		draw(screen, fontName, message, centerPosX - fontWidth / 2, centerPosY
-				- fontHeight / 2);
+		int posX = centerPos.getX() - fontWidth / 2;
+		int posY = centerPos.getY() - fontHeight / 2;
+		Position pos = new Position(posX, posY);
+		draw(screen, fontName, message, pos);
 	}
 
 	/**

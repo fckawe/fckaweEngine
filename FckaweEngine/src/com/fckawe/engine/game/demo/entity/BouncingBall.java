@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fckawe.engine.core.Vector;
 import com.fckawe.engine.game.Game;
 import com.fckawe.engine.game.entity.Entity;
 import com.fckawe.engine.grafix.Bitmaps;
@@ -20,12 +21,13 @@ public class BouncingBall extends Entity {
 
 	@Override
 	protected void init() {
-		setAccelerationSpeed(50);
-		setDecelerationSpeed(50);
-		setMaxAcceleration(200);
-		setMaxVelocity(200);
-		setFrictionX(1);
-		setFrictionY(1);
+		accelerationSpeed = new Vector(50, 50);
+		decelerationSpeed = new Vector(50, 50);
+		accelerationMax = new Vector(200, 200);
+		velocityMax = new Vector(200, 200);
+		friction = new Vector(10, 10);
+		canMoveX = true;
+		canMoveY = true;
 	}
 
 	@Override

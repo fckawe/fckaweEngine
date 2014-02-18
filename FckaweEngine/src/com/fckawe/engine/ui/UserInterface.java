@@ -11,6 +11,7 @@ import java.util.Observer;
 
 import com.fckawe.engine.core.Configuration;
 import com.fckawe.engine.core.Heart;
+import com.fckawe.engine.core.Position;
 import com.fckawe.engine.core.Session;
 import com.fckawe.engine.game.Game;
 import com.fckawe.engine.grafix.Bitmaps;
@@ -38,6 +39,7 @@ public class UserInterface extends Canvas implements Observer {
 	private Bitmaps bitmaps;
 
 	private boolean showFps;
+	private Position showFpsPosition;
 
 	public UserInterface() {
 		Dimension uiDimension = getUiDimension();
@@ -80,6 +82,7 @@ public class UserInterface extends Canvas implements Observer {
 		Session session = Session.getSession();
 		Configuration cfg = session.getConfiguration();
 		showFps = cfg.getScreenCat().isShowFps();
+		showFpsPosition = new Position(5, 5);
 		frame.setTitle(cfg.getApplicationCat().getName() + " [powered by "
 				+ session.getEngineName() + "]");
 		inputHandler = createInputHandler();
@@ -162,7 +165,7 @@ public class UserInterface extends Canvas implements Observer {
 		game.render(screen);
 
 		if (showFps) {
-			fonts.draw(screen, "FPS:" + (int) framesPerSecond, 5, 5);
+			fonts.draw(screen, "FPS:" + (int) framesPerSecond, showFpsPosition);
 		}
 
 		BufferStrategy bs = getBufferStrategy();

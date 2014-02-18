@@ -3,6 +3,8 @@ package com.fckawe.engine.grafix;
 import java.awt.Dimension;
 import java.util.Arrays;
 
+import com.fckawe.engine.core.Position;
+
 /**
  * A bitmap graphic represented by its pixel values.
  * @author fckawe
@@ -72,41 +74,40 @@ public class Bitmap {
 		Arrays.fill(pixels, color);
 	}
 
-	public void blit(final Bitmap bitmap, final int posX, final int posY) {
-		blitInternal(bitmap, posX, posY, bitmap.getWidth(), bitmap.getHeight(),
+	public void blit(final Bitmap bitmap, final Position pos) {
+		blitInternal(bitmap, pos, bitmap.getWidth(), bitmap.getHeight(),
 				false);
 	}
 
-	public void blit(final Bitmap bitmap, final int posX, final int posY,
+	public void blit(final Bitmap bitmap, final Position pos,
 			final int insWidth, final int insHeight) {
-		blitInternal(bitmap, posX, posY, bitmap.getWidth(), bitmap.getHeight(),
+		blitInternal(bitmap, pos, bitmap.getWidth(), bitmap.getHeight(),
 				false);
 	}
 
-	public void transparencyBlit(final Bitmap bitmap, final int posX,
-			final int posY) {
-		blitInternal(bitmap, posX, posY, bitmap.getWidth(), bitmap.getHeight(),
+	public void transparencyBlit(final Bitmap bitmap, final Position pos) {
+		blitInternal(bitmap, pos, bitmap.getWidth(), bitmap.getHeight(),
 				true);
 	}
 
-	public void transparencyBlit(final Bitmap bitmap, final int posX,
-			final int posY, final int insWidth, final int insHeight) {
-		blitInternal(bitmap, posX, posY, bitmap.getWidth(), bitmap.getHeight(),
+	public void transparencyBlit(final Bitmap bitmap, final Position pos,
+			final int insWidth, final int insHeight) {
+		blitInternal(bitmap, pos, bitmap.getWidth(), bitmap.getHeight(),
 				true);
 	}
 
-	private void blitInternal(final Bitmap bitmap, final int posX,
-			final int posY, final int insWidth, final int insHeight,
+	private void blitInternal(final Bitmap bitmap, final Position pos,
+			final int insWidth, final int insHeight,
 			boolean withTransparency) {
 
-		int posXTopLeft = posX < 0 ? 0 : posX;
-		int posXBottomRight = posX + insWidth;
+		int posXTopLeft = pos.getX() < 0 ? 0 : pos.getX();
+		int posXBottomRight = pos.getX() + insWidth;
 		if (posXBottomRight > width) {
 			posXBottomRight = width;
 		}
 
-		int posYTopLeft = posY < 0 ? 0 : posY;
-		int posYBottomRight = posY + insHeight;
+		int posYTopLeft = pos.getY() < 0 ? 0 : pos.getY();
+		int posYBottomRight = pos.getY() + insHeight;
 		if (posYBottomRight > height) {
 			posYBottomRight = height;
 		}
@@ -115,8 +116,8 @@ public class Bitmap {
 
 		for (int y = posYTopLeft; y < posYBottomRight; y++) {
 			int lineStartOffset = (y * width) + posXTopLeft;
-			int bitmapOffset = (y - posY) * bitmap.getWidth()
-					+ (posXTopLeft - posX);
+			int bitmapOffset = (y - pos.getY()) * bitmap.getWidth()
+					+ (posXTopLeft - pos.getX());
 			for (int x = 0; x < insertWidth; x++) {
 				int col = bitmap.pixels[bitmapOffset + x];
 				if (col < 0 || withTransparency) {

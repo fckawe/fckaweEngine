@@ -2,6 +2,8 @@ package com.fckawe.engine.game.entity;
 
 import java.util.List;
 
+import com.fckawe.engine.core.Vector;
+import com.fckawe.engine.core.Position;
 import com.fckawe.engine.game.Game;
 import com.fckawe.engine.grafix.Bitmap;
 import com.fckawe.engine.grafix.Bitmaps;
@@ -13,31 +15,27 @@ public abstract class Entity {
 	protected Game game;
 
 	protected Bitmap currentBitmap;
+	
+	protected Position pos;
+	
+	protected Vector velocity;
+	
+	protected Vector acceleration;
+	
+	protected Vector accelerationSpeed;
+	
+	protected Vector decelerationSpeed;
 
-	protected int pX;
+	protected Vector accelerationMax;
+	
+	protected Vector velocityMax;
+	
+	protected Vector friction;
 
-	protected int pY;
-
-	protected double vX;
-
-	protected double vY;
-
-	protected double aX;
-
-	protected double aY;
-
-	private double accelerationSpeed;
-
-	private double decelerationSpeed;
-
-	private double maxAcceleration;
-
-	private double maxVelocity;
-
-	private double frictionX;
-
-	private double frictionY;
-
+	protected boolean canMoveX;
+	
+	protected boolean canMoveY;
+	
 	public Entity(final Game game) {
 		this.game = game;
 		initDefaults();
@@ -45,12 +43,16 @@ public abstract class Entity {
 	}
 
 	protected void initDefaults() {
-		accelerationSpeed = 50;
-		decelerationSpeed = 50;
-		maxAcceleration = 200;
-		maxVelocity = 200;
-		frictionX = 1;
-		frictionY = 1;
+		pos = new Position(0, 0);
+		velocity = new Vector(0, 0);
+		acceleration = new Vector(0, 0);
+		accelerationSpeed = new Vector(50, 50);
+		decelerationSpeed = new Vector(50, 50);
+		accelerationMax = new Vector(200, 200);
+		velocityMax = new Vector(200, 200);
+		friction = new Vector(1, 1);
+		canMoveX = true;
+		canMoveY = true;
 	}
 
 	protected abstract void init();
@@ -69,57 +71,50 @@ public abstract class Entity {
 
 	public void tick(final InputHandler inputHandler, final long elapsedTime) {
 		long divisor = Math.max(elapsedTime, 1);
-
-		// limit acceleration
-		aX = limitDoubleToMax(aX, maxAcceleration);
-		aY = limitDoubleToMax(aY, maxAcceleration);
-
-		if (aX == 0) {
-			if (frictionX != 0) {
+		velocity.applyDivisor(divisor);
+		acceleration.applyDivisor(divisor);
+		
+		if(canMoveX) {
+			// limit acceleration
+			acceleration.applyMaxX(accelerationMax.getX());
+			if (acceleration.getX() == 0) {
 				// slow down (friction)
-				if (vX > 0) {
-					vX -= (vX < frictionX) ? 0 : frictionX;
-				} else if (vX < 0) {
-					vX += (Math.abs(vX) < frictionX) ? 0 : frictionX;
-				}
+				velocity.xTowardsZero(friction.getX());
+			} else {
+				// speed up
+				velocity.increaseX(acceleration);
 			}
+			// limit velocity
+			velocity.applyMaxX(velocityMax.getX());
 		} else {
-			// speed up
-			vX += aX / divisor;
+			acceleration.setX(0);
+			velocity.setX(0);
 		}
-		if (aY == 0) {
-			if (frictionY != 0) {
+		
+		if(canMoveY) {
+			// limit acceleration
+			acceleration.applyMaxY(accelerationMax.getY());
+			if (acceleration.getY() == 0) {
 				// slow down (friction)
-				if (vY > 0) {
-					vY -= vY < frictionY ? 0 : frictionY;
-				} else if (vY < 0) {
-					vY += Math.abs(vY) < frictionY ? 0 : frictionY;
-				}
+				velocity.yTowardsZero(friction.getY());
+			} else {
+				// speed up
+				velocity.increaseY(acceleration);
 			}
+			// limit velocity
+			velocity.applyMaxY(velocityMax.getY());
 		} else {
-			// speed up
-			vY += aY / divisor;
+			acceleration.setY(0);
+			velocity.setY(0);
 		}
-
-		// limit velocity
-		vX = limitDoubleToMax(vX, maxVelocity);
-		vY = limitDoubleToMax(vY, maxVelocity);
-
+		
 		// update position
-		pX += vX / divisor;
-		pY += vY / divisor;
-	}
-
-	protected double limitDoubleToMax(final double val, final double max) {
-		if (Math.abs(val) > max) {
-			return val < 0 ? max * -1 : max;
-		}
-		return val;
+		pos.move(velocity);
 	}
 
 	public void render(final Screen screen) {
 		if (currentBitmap != null) {
-			screen.blit(currentBitmap, pX, pY);
+			screen.blit(currentBitmap, pos);
 		}
 	}
 
@@ -133,66 +128,26 @@ public abstract class Entity {
 
 	protected void accelerateX(final int dir) {
 		if (dir > 0) { // right
-			aX += accelerationSpeed;
+			acceleration.increaseX(accelerationSpeed);
 		} else if (dir < 0) { // left
-			aX -= accelerationSpeed;
+			acceleration.decreaseX(accelerationSpeed);
 		}
 	}
 
 	protected void accelerateY(final int dir) {
 		if (dir > 0) { // down
-			aY += accelerationSpeed;
+			acceleration.increaseY(accelerationSpeed);
 		} else if (dir < 0) { // up
-			aY -= accelerationSpeed;
+			acceleration.decreaseY(accelerationSpeed);
 		}
 	}
 
 	protected void decelerateX() {
-		if (aX > decelerationSpeed) {
-			aX -= decelerationSpeed;
-		} else if (aX > 0) {
-			aX = 0;
-		} else if (Math.abs(aX) < decelerationSpeed) {
-			aX += decelerationSpeed;
-		} else if (aX < 0) {
-			aX = 0;
-		}
+		acceleration.xTowardsZero(decelerationSpeed.getX());
 	}
 
 	protected void decelerateY() {
-		if (aY > decelerationSpeed) {
-			aY -= decelerationSpeed;
-		} else if (aY > 0) {
-			aY = 0;
-		} else if (Math.abs(aY) < decelerationSpeed) {
-			aY += decelerationSpeed;
-		} else if (aY < 0) {
-			aY = 0;
-		}
-	}
-
-	protected void setAccelerationSpeed(final double accelerationSpeed) {
-		this.accelerationSpeed = accelerationSpeed;
-	}
-
-	protected void setDecelerationSpeed(final double decelerationSpeed) {
-		this.decelerationSpeed = decelerationSpeed;
-	}
-
-	protected void setMaxAcceleration(final double maxAcceleration) {
-		this.maxAcceleration = maxAcceleration;
-	}
-
-	protected void setMaxVelocity(final double maxVelocity) {
-		this.maxVelocity = maxVelocity;
-	}
-
-	protected void setFrictionX(final double frictionX) {
-		this.frictionX = frictionX;
-	}
-
-	protected void setFrictionY(final double frictionY) {
-		this.frictionY = frictionY;
+		acceleration.yTowardsZero(decelerationSpeed.getY());
 	}
 
 }
