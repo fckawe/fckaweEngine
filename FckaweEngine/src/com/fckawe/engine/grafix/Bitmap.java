@@ -1,9 +1,8 @@
 package com.fckawe.engine.grafix;
 
-import java.awt.Dimension;
 import java.util.Arrays;
 
-import com.fckawe.engine.core.Position;
+import com.fckawe.engine.physics.Position;
 
 /**
  * A bitmap graphic represented by its pixel values.
@@ -42,14 +41,6 @@ public class Bitmap {
 		return height;
 	}
 	
-	/**
-	 * Returns the bitmap's dimension.
-	 * @return The dimension.
-	 */
-	public Dimension getDimension() {
-		return new Dimension(width, height);
-	}
-
 	/**
 	 * Returns an array of all the bitmap's pixels.
 	 * @return The pixels as an integer array.

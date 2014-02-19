@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
-import com.fckawe.engine.core.Position;
 import com.fckawe.engine.core.Session;
+import com.fckawe.engine.physics.Position;
 import com.fckawe.engine.ui.Screen;
 import com.fckawe.engine.ui.UserInterface;
 import com.fckawe.engine.utils.Breadcrumb;

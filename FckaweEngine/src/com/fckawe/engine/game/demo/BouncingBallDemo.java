@@ -19,7 +19,7 @@ public class BouncingBallDemo extends DemoModule {
 
 	@Override
 	protected void loadEntities() {
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 3; i++) {
 			entities.put("bouncingball" + (i + 1), new BouncingBall(game));
 		}
 	}

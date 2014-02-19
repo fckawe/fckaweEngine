@@ -1,13 +1,16 @@
 package com.fckawe.engine.game.entity;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import com.fckawe.engine.core.Position;
-import com.fckawe.engine.core.Vector;
 import com.fckawe.engine.game.Game;
 import com.fckawe.engine.grafix.Bitmap;
 import com.fckawe.engine.grafix.Bitmaps;
 import com.fckawe.engine.input.InputHandler;
+import com.fckawe.engine.physics.RectangularBounds;
+import com.fckawe.engine.physics.Position;
+import com.fckawe.engine.physics.Vector;
 import com.fckawe.engine.ui.Screen;
 
 public abstract class Entity {
@@ -18,29 +21,26 @@ public abstract class Entity {
 
 	protected Position pos;
 
-	protected Vector velocity;
+	protected List<RectangularBounds> boundaries;
 
-	protected Vector acceleration;
+	protected Vector velocity, acceleration;
 
-	protected Vector accelerationSpeed;
+	protected Vector velocityMax, accelerationMax;
 
-	protected Vector decelerationSpeed;
-
-	protected Vector accelerationMax;
-
-	protected Vector velocityMax;
+	protected Vector accelerationSpeed, decelerationSpeed;
 
 	protected Vector friction;
 
 	protected Vector weight;
 
+	protected boolean usePixelPerfectCollision;
+
 	public Entity(final Game game) {
 		this.game = game;
-		initDefaults();
-		init();
+		boundaries = new ArrayList<RectangularBounds>();
 	}
 
-	protected void initDefaults() {
+	public void init() {
 		pos = new Position(0, 0);
 		velocity = new Vector(0, 0);
 		acceleration = new Vector(0, 0);
@@ -50,9 +50,15 @@ public abstract class Entity {
 		velocityMax = new Vector(200, 200);
 		friction = new Vector(1, 1);
 		weight = new Vector(0, 100);
+		usePixelPerfectCollision = true;
+
+		initMore();
+		initBoundaries(boundaries);
 	}
 
-	protected abstract void init();
+	protected abstract void initMore();
+
+	protected abstract void initBoundaries(List<RectangularBounds> boundaries);
 
 	protected String getBitmapsIdPrefix() {
 		return getClass().getName();
@@ -71,6 +77,9 @@ public abstract class Entity {
 		velocity.applyDivisor(statisticalFps);
 		acceleration.applyDivisor(statisticalFps);
 
+		checkEntityCollision();
+		checkBorderCollision();
+
 		if (weight.getY() != 0) {
 			acceleration.increaseY(weight.getY());
 		}
@@ -80,8 +89,6 @@ public abstract class Entity {
 
 		// update position
 		pos.move(velocity);
-
-		checkBorderCollision();
 	}
 
 	protected void processMovementX() {
@@ -114,7 +121,7 @@ public abstract class Entity {
 
 	public void render(final Screen screen) {
 		if (currentBitmap != null) {
-			screen.blit(currentBitmap, pos);
+			screen.transparencyBlit(currentBitmap, pos);
 		}
 	}
 
@@ -150,6 +157,80 @@ public abstract class Entity {
 		acceleration.yTowardsZero(decelerationSpeed.getY());
 	}
 
+	protected void checkEntityCollision() {
+		Map<String, Entity> entities = game.getCurrentModule().getEntities();
+		for (Entity entity : entities.values()) {
+			if (entity != this) {
+				checkCollisionWith(entity);
+			}
+		}
+	}
+
+	protected void checkCollisionWith(final Entity other) {
+		int shiftX = other.getPosition().getX() - pos.getX();
+		int shiftY = other.getPosition().getY() - pos.getY();
+
+		for (RectangularBounds trb : boundaries) {
+			for (RectangularBounds orb : other.getBoundaries()) {
+				if (trb.intersects(orb, shiftX, shiftY)) {
+					boolean pixelPerfect = usePixelPerfectCollision
+							|| other.isUsePixelPerfectCollision();
+					if (currentBitmap == null
+							|| other.getCurrentBitmap() == null) {
+						pixelPerfect = false;
+					}
+
+					if (!pixelPerfect || collidesPixelPerfectWith(other)) {
+						collisionWith(other);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	protected boolean collidesPixelPerfectWith(final Entity other) {
+//		int x = pos.getX(), y = pos.getY();
+//		int w = currentBitmap.getWidth() - 1;
+//		int h = currentBitmap.getHeight() - 1;
+//		int ox = other.getPosition().getX(), oy = other.getPosition().getY();
+//		int ow = other.getCurrentBitmap().getWidth() - 1;
+//		int oh = other.getCurrentBitmap().getHeight() - 1;
+//
+//		// start/end x/y
+//		int sx = Math.max(x, ox);
+//		int sy = Math.max(y, oy);
+//		int ex = Math.min(w, ow);
+//		int ey = Math.min(h, oh);
+//
+//		// intersection rect
+//		int ix = Math.abs(ex - sx);
+//		int iy = Math.abs(ey - sy);
+//		
+//		int[] pxls = currentBitmap.getPixels();
+//		int[] opxls = other.getCurrentBitmap().getPixels();
+//		
+//		for(int py = 1; py < iy - 1; py++) {
+//			int ny = Math.abs(sy - y) + py;
+//			int ony = Math.abs(sy - oy) + py;
+//			
+//			for(int px = 1; px < ix - 1; px++) {
+//				int nx = Math.abs(sx - x) + px;
+//				int onx = Math.abs(sx - ox) + px;
+//				
+//				if(pxls[nx, ny] & 0xFF000000 != 0x00 && opxls[onx, ony] & 0xFF000000 != 0x00) {
+//					return true;
+//				}
+//			}
+//		}
+//
+//		return false;
+		return true;
+	}
+
+	protected void collisionWith(final Entity other) {
+	}
+
 	protected void checkBorderCollision() {
 		int x = pos.getX();
 		int mostLeft = getMostLeftPosition();
@@ -172,6 +253,14 @@ public abstract class Entity {
 				collisionWithBottomBorder(mostBottom);
 			}
 		}
+	}
+
+	protected Position getPosition() {
+		return pos;
+	}
+
+	protected List<RectangularBounds> getBoundaries() {
+		return boundaries;
 	}
 
 	protected int getMostLeftPosition() {
@@ -214,6 +303,18 @@ public abstract class Entity {
 		pos.setY(mostBottom);
 		acceleration.setY(0);
 		velocity.setY(0);
+	}
+
+	public Vector getVelocity() {
+		return velocity;
+	}
+
+	public Bitmap getCurrentBitmap() {
+		return currentBitmap;
+	}
+
+	public boolean isUsePixelPerfectCollision() {
+		return usePixelPerfectCollision;
 	}
 
 }

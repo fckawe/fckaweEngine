@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.fckawe.engine.core.Vector;
 import com.fckawe.engine.game.Game;
 import com.fckawe.engine.game.entity.Entity;
+import com.fckawe.engine.grafix.Bitmap;
 import com.fckawe.engine.grafix.Bitmaps;
 import com.fckawe.engine.input.InputHandler;
+import com.fckawe.engine.physics.RectangularBounds;
+import com.fckawe.engine.physics.Vector;
 import com.fckawe.engine.ui.Screen;
 
 public class BouncingBall extends Entity {
@@ -21,28 +23,39 @@ public class BouncingBall extends Entity {
 	}
 
 	@Override
-	protected void init() {
+	protected void initMore() {
 		accelerationSpeed = new Vector(700, 700);
 		decelerationSpeed = new Vector(500, 500);
 		accelerationMax = new Vector(800, 800);
 		velocityMax = new Vector(800, 800);
 		friction = new Vector(0, 0);
 		weight = new Vector(0, 0);
-		
+
 		Screen screen = game.getUserInterface().getScreen();
 		pos.setX(screen.getWidth() / 2);
 		pos.setY(screen.getHeight() / 2);
 		Random rnd;
 		int tmp;
 		int max;
-		max = (int)velocityMax.getX();
+		max = (int) velocityMax.getX();
 		rnd = new Random();
 		tmp = rnd.nextInt(max * 2 - 1);
 		velocity.setX(tmp - max);
-		max = (int)velocityMax.getY();
+		max = (int) velocityMax.getY();
 		rnd = new Random();
 		tmp = rnd.nextInt(max * 2 - 1);
 		velocity.setY(tmp - max);
+	}
+
+	@Override
+	protected void initBoundaries(final List<RectangularBounds> boundaries) {
+		Bitmaps bitmaps = getBitmaps();
+		String globalId = getGlobalBitmapId(BMP_BOUNCING_BALL);
+		Bitmap bmp = bitmaps.getBitmap(globalId);
+
+		RectangularBounds rb = new RectangularBounds(0, 0, bmp.getWidth(),
+				bmp.getHeight());
+		boundaries.add(rb);
 	}
 
 	@Override
@@ -97,7 +110,7 @@ public class BouncingBall extends Entity {
 	public void render(final Screen screen) {
 		super.render(screen);
 	}
-	
+
 	@Override
 	protected void collisionWithLeftBorder(final int mostLeft) {
 		double newVelocityX = velocity.getDirectX() * -1;
@@ -124,6 +137,22 @@ public class BouncingBall extends Entity {
 		double newVelocityY = velocity.getDirectY() * -1;
 		super.collisionWithBottomBorder(mostBottom);
 		velocity.setY(newVelocityY);
+	}
+
+	@Override
+	protected void collisionWith(final Entity other) {
+		// TODO: simply negate velocity; lazy physics / just to have a
+		// collision behavior
+
+		double newVelocityX = velocity.getDirectX() * -1;
+		double newVelocityY = velocity.getDirectY() * -1;
+		velocity.setX(newVelocityX);
+		velocity.setY(newVelocityY);
+
+		double otherNewVelocityX = other.getVelocity().getDirectX() * -1;
+		double otherNewVelocityY = other.getVelocity().getDirectY() * -1;
+		other.getVelocity().setX(otherNewVelocityX);
+		other.getVelocity().setY(otherNewVelocityY);
 	}
 
 }

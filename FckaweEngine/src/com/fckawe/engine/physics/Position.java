@@ -1,4 +1,4 @@
-package com.fckawe.engine.core;
+package com.fckawe.engine.physics;
 
 public class Position {
 	

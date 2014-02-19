@@ -11,13 +11,13 @@ import java.util.Observer;
 
 import com.fckawe.engine.core.Configuration;
 import com.fckawe.engine.core.Heart;
-import com.fckawe.engine.core.Position;
 import com.fckawe.engine.core.Session;
 import com.fckawe.engine.game.Game;
 import com.fckawe.engine.grafix.Bitmaps;
 import com.fckawe.engine.grafix.Font;
 import com.fckawe.engine.grafix.Fonts;
 import com.fckawe.engine.input.InputHandler;
+import com.fckawe.engine.physics.Position;
 
 public class UserInterface extends Canvas implements Observer {
 

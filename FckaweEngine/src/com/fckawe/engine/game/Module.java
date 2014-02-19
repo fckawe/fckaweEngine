@@ -58,6 +58,7 @@ public abstract class Module {
 					entity.loadRequiredBitmap(bmpId, globalId);
 				}
 			}
+			entity.init();
 		}
 	}
 
@@ -105,6 +106,10 @@ public abstract class Module {
 
 	public Module getContinueWithModule() {
 		return continueWithModule;
+	}
+	
+	public Map<String, Entity> getEntities() {
+		return entities;
 	}
 
 }
