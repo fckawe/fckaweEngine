@@ -179,8 +179,8 @@ public class UserInterface extends Canvas implements Observer {
 	}
 
 	private synchronized void render(final Graphics g) {
-		int width = (int) uiDimension.getWidth();
-		int height = (int) uiDimension.getHeight();
+		int width = (int) getWidth();
+		int height = (int) getHeight();
 
 		g.translate(screenTranslatedX, screenTranslatedY);
 		g.clipRect(0, 0, width, height);
@@ -205,6 +205,10 @@ public class UserInterface extends Canvas implements Observer {
 			inputHandler.tick();
 		}
 		game.tick(inputHandler, elapsedTime);
+	}
+	
+	public Fonts getFonts() {
+		return fonts;
 	}
 
 	public Font getFont(final String fontName) {

@@ -27,6 +27,10 @@ public class Bitmaps {
 	public void discardBitmaps() {
 		bitmaps.clear();
 	}
+	
+	public boolean isLoaded(final String id) {
+		return bitmaps.containsKey(id);
+	}
 
 	public Bitmap getBitmap(final String id) {
 		return bitmaps.get(id)[0][0];

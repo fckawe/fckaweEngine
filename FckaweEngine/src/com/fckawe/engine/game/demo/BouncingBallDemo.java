@@ -3,27 +3,25 @@ package com.fckawe.engine.game.demo;
 import java.awt.event.KeyEvent;
 
 import com.fckawe.engine.game.Game;
-import com.fckawe.engine.game.Module;
 import com.fckawe.engine.game.demo.entity.BouncingBall;
 import com.fckawe.engine.input.InputHandler;
 
-public class BouncingBallDemo extends Module {
-
-	private long startTime;
+public class BouncingBallDemo extends DemoModule {
 
 	public BouncingBallDemo(final Game game) {
 		super(game);
-		startTime = 0;
 	}
 
 	@Override
 	protected String getModuleName() {
-		return "Bouncing Demo";
+		return "BouncingBall Demo";
 	}
 
 	@Override
 	protected void loadEntities() {
-		entities.put("bouncingball", new BouncingBall(game));
+		for (int i = 0; i < 10; i++) {
+			entities.put("bouncingball" + (i + 1), new BouncingBall(game));
+		}
 	}
 
 	@Override
@@ -32,15 +30,8 @@ public class BouncingBallDemo extends Module {
 
 		if (inputHandler.isPressed(KeyEvent.VK_ESCAPE)) {
 			inputHandler.consume(KeyEvent.VK_ESCAPE);
-			end(null);
-		} else {
-			// long currentTime = System.currentTimeMillis();
-			// if (startTime == 0) {
-			// startTime = currentTime;
-			// } else if (currentTime - startTime >= 15000) {
-			// end(null);
-			// }
+			setEnd(null);
 		}
 	}
-
+	
 }

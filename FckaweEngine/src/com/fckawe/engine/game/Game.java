@@ -46,17 +46,17 @@ public class Game {
 
 	public void stop() {
 		if (module != null) {
-			module.end(null);
+			module.setEnd(null);
 		}
 	}
 
 	public void setModule(final Module module) {
+		if(this.module != null) {
+			this.module.end();
+		}
 		if (module == null) {
 			this.module = null;
 		} else if (this.module != module) {
-			if (this.module != null) {
-				this.module.unload();
-			}
 			module.load();
 			this.module = module;
 		}

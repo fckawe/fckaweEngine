@@ -3,6 +3,7 @@ package com.fckawe.engine.game.demo.entity;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.fckawe.engine.core.Vector;
 import com.fckawe.engine.game.Game;
@@ -21,11 +22,27 @@ public class BouncingBall extends Entity {
 
 	@Override
 	protected void init() {
-		accelerationSpeed = new Vector(50, 50);
-		decelerationSpeed = new Vector(50, 50);
-		accelerationMax = new Vector(200, 200);
-		velocityMax = new Vector(200, 200);
-		friction = new Vector(10, 10);
+		accelerationSpeed = new Vector(700, 700);
+		decelerationSpeed = new Vector(500, 500);
+		accelerationMax = new Vector(800, 800);
+		velocityMax = new Vector(800, 800);
+		friction = new Vector(0, 0);
+		weight = new Vector(0, 0);
+		
+		Screen screen = game.getUserInterface().getScreen();
+		pos.setX(screen.getWidth() / 2);
+		pos.setY(screen.getHeight() / 2);
+		Random rnd;
+		int tmp;
+		int max;
+		max = (int)velocityMax.getX();
+		rnd = new Random();
+		tmp = rnd.nextInt(max * 2 - 1);
+		velocity.setX(tmp - max);
+		max = (int)velocityMax.getY();
+		rnd = new Random();
+		tmp = rnd.nextInt(max * 2 - 1);
+		velocity.setY(tmp - max);
 	}
 
 	@Override
@@ -36,9 +53,8 @@ public class BouncingBall extends Entity {
 	}
 
 	@Override
-	public void loadRequiredBitmap(final String id) {
+	public void loadRequiredBitmap(final String id, final String globalId) {
 		Bitmaps bitmaps = getBitmaps();
-		String globalId = getGlobalBitmapId(id);
 		if (id.equals(BMP_BOUNCING_BALL)) {
 			bitmaps.loadBitmap(globalId, "/images/demo/bouncingball.png");
 		}
@@ -81,14 +97,33 @@ public class BouncingBall extends Entity {
 	public void render(final Screen screen) {
 		super.render(screen);
 	}
+	
+	@Override
+	protected void collisionWithLeftBorder(final int mostLeft) {
+		double newVelocityX = velocity.getDirectX() * -1;
+		super.collisionWithLeftBorder(mostLeft);
+		velocity.setX(newVelocityX);
+	}
+
+	@Override
+	protected void collisionWithRightBorder(final int mostRight) {
+		double newVelocityX = velocity.getDirectX() * -1;
+		super.collisionWithRightBorder(mostRight);
+		velocity.setX(newVelocityX);
+	}
+
+	@Override
+	protected void collisionWithTopBorder(final int mostTop) {
+		double newVelocityY = velocity.getDirectY() * -1;
+		super.collisionWithTopBorder(mostTop);
+		velocity.setY(newVelocityY);
+	}
 
 	@Override
 	protected void collisionWithBottomBorder(final int mostBottom) {
-		double newAccelerationY = acceleration.getDirectY() * -0.9;
-
+		double newVelocityY = velocity.getDirectY() * -1;
 		super.collisionWithBottomBorder(mostBottom);
-
-		acceleration.setY(newAccelerationY);
+		velocity.setY(newVelocityY);
 	}
 
 }

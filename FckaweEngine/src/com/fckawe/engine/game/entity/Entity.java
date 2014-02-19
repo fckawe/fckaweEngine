@@ -58,19 +58,18 @@ public abstract class Entity {
 		return getClass().getName();
 	}
 
-	protected String getGlobalBitmapId(final String id) {
+	public String getGlobalBitmapId(final String id) {
 		return getBitmapsIdPrefix() + "." + id;
 	}
 
 	public abstract List<String> getRequiredBitmapIds();
 
-	public abstract void loadRequiredBitmap(String id);
+	public abstract void loadRequiredBitmap(String id, String globalId);
 
 	public void tick(final InputHandler inputHandler, final long elapsedTime) {
-		long divisor = Math.max(elapsedTime, 1);
-		velocity.applyDivisor(divisor);
-		acceleration.applyDivisor(divisor);
-		weight.applyDivisor(divisor);
+		long statisticalFps = 1000 / Math.max(elapsedTime, 1);
+		velocity.applyDivisor(statisticalFps);
+		acceleration.applyDivisor(statisticalFps);
 
 		if (weight.getY() != 0) {
 			acceleration.increaseY(weight.getY());

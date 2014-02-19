@@ -116,5 +116,10 @@ public class Vector {
 		}
 		return val;
 	}
+	
+	@Override
+	public String toString() {
+		return "Vector(" + x + "," + y + "/" + divisor + ")";
+	}
 
 }

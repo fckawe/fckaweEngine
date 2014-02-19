@@ -53,7 +53,10 @@ public abstract class Module {
 			Entity entity = entities.get(entityId);
 			List<String> bmpIds = entity.getRequiredBitmapIds();
 			for (String bmpId : bmpIds) {
-				entity.loadRequiredBitmap(bmpId);
+				String globalId = entity.getGlobalBitmapId(bmpId);
+				if(!bitmaps.isLoaded(globalId)) {
+					entity.loadRequiredBitmap(bmpId, globalId);
+				}
 			}
 		}
 	}
@@ -63,7 +66,16 @@ public abstract class Module {
 			logger.info("Unload resources for module '{}'.", name);
 		}
 
-		// TODO: remove bitmaps
+		for(String entityId : entities.keySet()) {
+			Entity entity = entities.get(entityId);
+			List<String> bmpIds = entity.getRequiredBitmapIds();
+			for(String bmpId : bmpIds) {
+				String globalId = entity.getGlobalBitmapId(bmpId);
+				if(bitmaps.isLoaded(globalId)) {
+					bitmaps.remove(globalId);
+				}
+			}
+		}
 	}
 
 	public void tick(final InputHandler inputHandler, final long elapsedTime) {
@@ -77,11 +89,14 @@ public abstract class Module {
 			entity.render(screen);
 		}
 	}
-
-	protected void end(final Module continueWithModule) {
-		unload();
+	
+	protected void setEnd(final Module continueWithModule) {
 		ended = true;
 		this.continueWithModule = continueWithModule;
+	}
+	
+	protected void end() {
+		unload();
 	}
 
 	public boolean isEnded() {
