@@ -190,42 +190,45 @@ public abstract class Entity {
 	}
 
 	protected boolean collidesPixelPerfectWith(final Entity other) {
-//		int x = pos.getX(), y = pos.getY();
-//		int w = currentBitmap.getWidth() - 1;
-//		int h = currentBitmap.getHeight() - 1;
-//		int ox = other.getPosition().getX(), oy = other.getPosition().getY();
-//		int ow = other.getCurrentBitmap().getWidth() - 1;
-//		int oh = other.getCurrentBitmap().getHeight() - 1;
-//
-//		// start/end x/y
-//		int sx = Math.max(x, ox);
-//		int sy = Math.max(y, oy);
-//		int ex = Math.min(w, ow);
-//		int ey = Math.min(h, oh);
-//
-//		// intersection rect
-//		int ix = Math.abs(ex - sx);
-//		int iy = Math.abs(ey - sy);
-//		
-//		int[] pxls = currentBitmap.getPixels();
-//		int[] opxls = other.getCurrentBitmap().getPixels();
-//		
-//		for(int py = 1; py < iy - 1; py++) {
-//			int ny = Math.abs(sy - y) + py;
-//			int ony = Math.abs(sy - oy) + py;
-//			
-//			for(int px = 1; px < ix - 1; px++) {
-//				int nx = Math.abs(sx - x) + px;
-//				int onx = Math.abs(sx - ox) + px;
-//				
-//				if(pxls[nx, ny] & 0xFF000000 != 0x00 && opxls[onx, ony] & 0xFF000000 != 0x00) {
-//					return true;
-//				}
-//			}
-//		}
-//
-//		return false;
-		return true;
+		int[] pxls = currentBitmap.getPixels();
+		int[] opxls = other.getCurrentBitmap().getPixels();
+
+		// find top left and bottom right coords of this
+		int tlx = pos.getX(), tly = pos.getY();
+		int w = currentBitmap.getWidth();
+		int h = currentBitmap.getHeight();
+		int brx = tlx + w - 1, bry = tly + h - 1;
+
+		// find top left and bottom right coords of other
+		int otlx = other.getPosition().getX(), otly = other.getPosition()
+				.getY();
+		int ow = other.getCurrentBitmap().getWidth();
+		int oh = other.getCurrentBitmap().getHeight();
+		int obrx = otlx + ow - 1, obry = otly + oh - 1;
+
+		// find top left and bottom right coords of intersection
+		int itlx = Math.max(tlx, otlx), itly = Math.max(tly, otly);
+		int ibrx = Math.min(brx, obrx), ibry = Math.min(bry, obry);
+
+		for (int iy = itly; iy <= ibry; iy++) {
+			int py = iy - tly;
+			int opy = iy - otly;
+
+			for (int ix = itlx; ix <= ibrx; ix++) {
+				int px = ix - tlx;
+				int opx = ix - otlx;
+
+				int pidx = py * w + px;
+				int opidx = opy * ow + opx;
+
+				if ((pxls[pidx] & 0xFF000000) != 0x00
+						&& (opxls[opidx] & 0xFF000000) != 0x00) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	protected void collisionWith(final Entity other) {
