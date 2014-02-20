@@ -9,7 +9,7 @@ import com.fckawe.engine.ui.Screen;
 
 public abstract class DemoModule extends Module {
 
-	protected int showDurationInSecs = 150;
+	protected int showDurationInSecs = 15;
 
 	private long startTime;
 
