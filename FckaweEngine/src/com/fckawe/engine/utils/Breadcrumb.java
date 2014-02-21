@@ -9,9 +9,9 @@ import java.util.Stack;
  */
 @SuppressWarnings("serial")
 public class Breadcrumb extends Stack<String> {
-	
+
 	public static final String PATH_SEPARATOR = ".";
-	
+
 	public static final String PATH_SEPARATOR_REGEXED = "\\.";
 
 	/**

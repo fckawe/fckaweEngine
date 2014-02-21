@@ -19,6 +19,12 @@ import com.fckawe.engine.grafix.Fonts;
 import com.fckawe.engine.input.InputHandler;
 import com.fckawe.engine.physics.Position;
 
+/**
+ * The main user interface of the game. The central point for all inputs and
+ * outputs.
+ * 
+ * @author fckawe
+ */
 public class UserInterface extends Canvas implements Observer {
 
 	private static final long serialVersionUID = -5961759679622983414L;
@@ -41,6 +47,9 @@ public class UserInterface extends Canvas implements Observer {
 	private boolean showFps;
 	private Position showFpsPosition;
 
+	/**
+	 * Constructor to create a new user interface.
+	 */
 	public UserInterface() {
 		Dimension uiDimension = getUiDimension();
 		setPreferredSize(uiDimension);
@@ -59,24 +68,45 @@ public class UserInterface extends Canvas implements Observer {
 		game = Session.getSession().getFckaweFactory().newGame(this);
 	}
 
+	/**
+	 * Initializes the grafix stuff.
+	 */
 	protected void initGrafix() {
 		bitmaps = createBitmaps();
 		fonts = createFonts();
 		fonts.loadFonts();
 	}
 
+	/**
+	 * Creates the fonts interface.
+	 * 
+	 * @return The newly created fonts interface.
+	 */
 	protected Fonts createFonts() {
 		return new Fonts(this);
 	}
 
+	/**
+	 * Creates the bitmaps interface.
+	 * 
+	 * @return The newly created bitmaps interface.
+	 */
 	protected Bitmaps createBitmaps() {
 		return new Bitmaps();
 	}
 
+	/**
+	 * Creates the input handler.
+	 * 
+	 * @return The newly created input handler.
+	 */
 	protected InputHandler createInputHandler() {
 		return new InputHandler();
 	}
 
+	/**
+	 * Starts the user interface (which causes the window to open).
+	 */
 	public void start() {
 		frame = new Frame(this);
 		Session session = Session.getSession();
@@ -90,6 +120,10 @@ public class UserInterface extends Canvas implements Observer {
 		frame.setVisible(true);
 	}
 
+	/**
+	 * Stops the user interface (which causes the game to stop and the window to
+	 * close).
+	 */
 	public void stop() {
 		game.stop();
 		frame.close();
@@ -159,6 +193,9 @@ public class UserInterface extends Canvas implements Observer {
 		}
 	}
 
+	/**
+	 * Clears and newly renders the screen of the user interface.
+	 */
 	protected void render() {
 		screen.clear(0);
 
@@ -196,33 +233,71 @@ public class UserInterface extends Canvas implements Observer {
 		Toolkit.getDefaultToolkit().sync();
 	}
 
+	/**
+	 * Returns the screen of the user interface.
+	 * 
+	 * @return The screen on which all the grafix are displayed.
+	 */
 	public Screen getScreen() {
 		return screen;
 	}
 
+	/**
+	 * Performs a tick. Updates the game logic by one step.
+	 * 
+	 * @param elapsedTime
+	 *            The time with which the statistical FPS can be calculated.
+	 */
 	public void tick(final long elapsedTime) {
 		if (inputHandler != null) {
 			inputHandler.tick();
 		}
 		game.tick(inputHandler, elapsedTime);
 	}
-	
+
+	/**
+	 * Returns the fonts interface.
+	 * 
+	 * @return The fonts interface.
+	 */
 	public Fonts getFonts() {
 		return fonts;
 	}
 
+	/**
+	 * Returns the font specified by the given font name.
+	 * 
+	 * @param fontName
+	 *            The name of the font to return.
+	 * @return The font.
+	 */
 	public Font getFont(final String fontName) {
 		return fonts.getFont(fontName);
 	}
 
+	/**
+	 * Returns the bitmaps interface.
+	 * 
+	 * @return The bitmaps interface.
+	 */
 	public Bitmaps getBitmaps() {
 		return bitmaps;
 	}
 
+	/**
+	 * Returns the input handler.
+	 * 
+	 * @return The input handler.
+	 */
 	public InputHandler getInputHandler() {
 		return inputHandler;
 	}
 
+	/**
+	 * Returns the current FPS (frames per second) value.
+	 * 
+	 * @return The current FPS (frames per second) value.
+	 */
 	public double getCurrentFps() {
 		return framesPerSecond;
 	}

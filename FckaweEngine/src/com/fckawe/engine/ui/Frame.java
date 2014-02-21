@@ -243,7 +243,7 @@ public class Frame extends JFrame implements WindowListener {
 	}
 
 	/**
-	 * Comparator for display modes to help to sort them in decending order.
+	 * Comparator for display modes to help to sort them in descending order.
 	 * 
 	 * @author fckawe
 	 */
